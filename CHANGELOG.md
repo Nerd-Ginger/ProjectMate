@@ -11,6 +11,8 @@ Anything a user would notice gets a line here, in the same commit that ships it.
 - Feature-request import: reads the JSON contract the website will serve, with
   per-request error reporting so one bad entry never loses the rest of a batch,
   and deduplication so re-importing the same export changes nothing
+- Kanban board view: one column per status, add items inline, and advance a
+  card to the next column with one tap. Columns over their WIP limit say so
 - Create boards from templates — Projects, Life, Feature Requests or Simple —
   previewing each template's statuses before committing to one
 - Boards home screen showing every collection with a segmented progress bar

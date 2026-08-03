@@ -107,7 +107,7 @@ opening it.
 
 ## Board views
 
-### 5. Board — Kanban ⬜
+### 5. Board — Kanban ✅
 
 | Contains | Notes |
 |---|---|
@@ -115,7 +115,7 @@ opening it.
 | Column header | Name, colour, count, WIP limit |
 | WIP warning | Column tints when over its limit — a nudge, nothing is blocked |
 | Item cards | Title, priority dot, due badge, tag dots, checklist progress |
-| Drag and drop | Within and between columns |
+| Advance button | One tap moves a card to the next column — the common case. Drag-and-drop is a later change; sort keys already support it |
 | Top bar | Board name, view-mode toggle, group-by, overflow |
 
 **Design note:** cards must stay readable at column width on a phone. Notes are

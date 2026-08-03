@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -36,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nerdginger.projectmate.di.AppContainer
+import com.nerdginger.projectmate.feature.board.BoardDetailScreen
+import com.nerdginger.projectmate.feature.board.BoardDetailViewModel
 import com.nerdginger.projectmate.feature.boards.BoardTemplateSheet
 import com.nerdginger.projectmate.feature.boards.BoardsScreen
 import com.nerdginger.projectmate.feature.boards.BoardsViewModel
@@ -74,7 +78,23 @@ fun ProjectMateApp(container: AppContainer) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { TopAppBar(title = { Text(navigator.current.title()) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(navigator.current.title()) },
+                navigationIcon = {
+                    // Only when there is somewhere to go back to within this
+                    // tab; a back arrow that exits the app is a trap.
+                    if (navigator.current !is Screen.TopLevel) {
+                        IconButton(onClick = { navigator.pop() }) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                            )
+                        }
+                    }
+                },
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             NavigationBar {
@@ -103,6 +123,13 @@ fun ProjectMateApp(container: AppContainer) {
                 contentPadding = insets,
             )
 
+            is Screen.BoardDetail -> BoardDetail(
+                container = container,
+                boardId = screen.boardId,
+                onOpenItem = { navigator.push(Screen.ItemDetail(it)) },
+                contentPadding = insets,
+            )
+
             else -> ComingSoon(
                 label = screen.title(),
                 modifier = Modifier.padding(insets),
@@ -120,6 +147,34 @@ fun ProjectMateApp(container: AppContainer) {
             )
         }
     }
+}
+
+/**
+ * Hosts the kanban view.
+ *
+ * Keyed by board id so opening a different board gets its own ViewModel
+ * rather than briefly showing the previous board's columns.
+ */
+@Composable
+private fun BoardDetail(
+    container: AppContainer,
+    boardId: String,
+    onOpenItem: (String) -> Unit,
+    contentPadding: androidx.compose.foundation.layout.PaddingValues,
+) {
+    val viewModel: BoardDetailViewModel = viewModel(
+        key = "board-$boardId",
+        factory = BoardDetailViewModel.factory(container, boardId),
+    )
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    BoardDetailScreen(
+        state = state,
+        onAddItem = viewModel::addItem,
+        onAdvance = viewModel::advance,
+        onOpenItem = onOpenItem,
+        contentPadding = contentPadding,
+    )
 }
 
 /**

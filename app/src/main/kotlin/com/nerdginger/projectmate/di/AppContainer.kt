@@ -4,6 +4,7 @@ import android.content.Context
 import com.nerdginger.projectmate.data.DatabaseSeeder
 import com.nerdginger.projectmate.data.ProjectMateDatabase
 import com.nerdginger.projectmate.data.repository.BoardRepository
+import com.nerdginger.projectmate.data.repository.ItemRepository
 
 /**
  * The dependency graph, wired by hand.
@@ -33,5 +34,9 @@ class AppContainer(context: Context) {
 
     val boardRepository: BoardRepository by lazy {
         BoardRepository(boardDao, statusDao, seeder)
+    }
+
+    val itemRepository: ItemRepository by lazy {
+        ItemRepository(itemDao, statusDao)
     }
 }
