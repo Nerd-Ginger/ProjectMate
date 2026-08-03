@@ -3,11 +3,9 @@ package com.nerdginger.projectmate.data.dao
 import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.Query
-import androidx.room3.Transaction
 import androidx.room3.Update
 import androidx.room3.Upsert
 import com.nerdginger.projectmate.data.entity.BoardEntity
-import com.nerdginger.projectmate.data.relation.BoardWithStatuses
 import kotlinx.coroutines.flow.Flow
 
 /** Per-board counts of open items by status category, for progress bars. */
@@ -97,7 +95,14 @@ interface BoardDao {
     @Query("UPDATE boards SET archivedAt = NULL, updatedAt = :now WHERE id = :id")
     suspend fun unarchive(id: String, now: Long)
 
-    @Transaction
-    @Query("SELECT * FROM boards WHERE id = :id AND deletedAt IS NULL")
-    fun observeWithStatuses(id: String): Flow<BoardWithStatuses?>
+    // No @Relation-based "board with its statuses" query here. Room 3 wants a
+    // different @Relation shape than Room 2 — it rejects a singular
+    // `parentColumn` with "Cannot have empty 'parentColumns'" — and the exact
+    // signature can't be checked from this environment.
+    //
+    // It isn't worth chasing: the repository composes observeById() with
+    // StatusDao.observeForBoard() using `combine`, which produces the same
+    // result from two independently observable flows and needs no annotation
+    // magic to be correct. Revisit only if profiling ever says the extra query
+    // matters, which at personal-tracker scale it will not.
 }
