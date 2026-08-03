@@ -1,8 +1,8 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
+    // No kotlin-android plugin: AGP 9 has built-in Kotlin support and applying
+    // org.jetbrains.kotlin.android alongside it is a hard error. The Compose,
+    // serialization and KSP plugins are still applied separately.
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
@@ -63,6 +63,8 @@ android {
 
     compileOptions {
         // No jvmToolchain block — see docs/DECISIONS.md D-012.
+        // With AGP's built-in Kotlin, jvmTarget defaults to
+        // targetCompatibility, so there is nothing further to configure.
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -95,12 +97,6 @@ android {
 // migrations can be tested against real historical schemas.
 room {
     schemaDirectory("$projectDir/schemas")
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_17
-    }
 }
 
 dependencies {

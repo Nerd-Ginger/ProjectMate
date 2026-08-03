@@ -31,6 +31,13 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
 
       - name: Run :core tests
+        # The runner image ships an Android SDK and sets ANDROID_HOME globally,
+        # which would make settings.gradle.kts configure :app here too. Blanking
+        # it keeps this job doing exactly what it claims: the pure-JVM module,
+        # with no Android configuration at all.
+        env:
+          ANDROID_HOME: ""
+          ANDROID_SDK_ROOT: ""
         run: ./gradlew :core:test --stacktrace
 
       - name: Upload test report
