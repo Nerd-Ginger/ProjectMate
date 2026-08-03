@@ -32,12 +32,12 @@ The goal: an app that is genuinely usable every day with no server involved.
 - ✅ Room entities, DAOs, database (no type converters needed)
 - ✅ Exported schemas committed under `app/schemas/` (by CI)
 - ✅ First-run seeding — Inbox system collection
-- ⬜ Repositories and `AppContainer` DI
+- ✅ Repositories and `AppContainer` DI
 
 ### Interface
 
-- ⬜ Material 3 theme, dark mode, navigation shell
-- ⬜ **Boards** — collection cards with progress, pinning, archive
+- ✅ Material 3 theme, dark mode, navigation shell
+- 🚧 **Boards** — collection cards with progress, pinning, archive
 - ⬜ Create collection from template
 - ⬜ **Board view** — kanban columns, move and advance status
 - ⬜ **List view** — grouped by status or due date

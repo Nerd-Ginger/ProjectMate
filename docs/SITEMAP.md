@@ -2,10 +2,13 @@
 
 Every view in ProjectMate, what it's for, and what it contains.
 
-**Status: specification, not shipped.** As of this writing the only screen in
-code is a placeholder. This document is the design target — it defines what
-gets built, and it's the reference for anyone designing the UI. Views are
-marked ⬜ planned / 🚧 building / ✅ shipped and updated as they land.
+**Status: mostly specification.** The navigation shell and the Boards home
+screen exist; every other view is a named placeholder in the app, so a build on
+a phone shows exactly how far things have got.
+
+This document is the design target — it defines what gets built, and it's the
+reference for anyone designing the UI. Views are marked ⬜ planned / 🚧 building
+/ ✅ shipped and updated as they land.
 
 Last updated: 2026-08-03
 
@@ -17,7 +20,7 @@ Single Activity. A back stack you push onto, four persistent top-level
 destinations, and a set of sheets that never take you off the current screen.
 
 ```
-NavigationSuiteScaffold          bottom bar on phones, rail on tablets/foldables
+Scaffold + NavigationBar        bottom bar (a tablet rail is a later change)
 ├── Boards          (top level)  every collection you own
 ├── Today           (top level)  what needs attention, across all boards
 ├── Inbox           (top level)  captured and imported, awaiting triage
@@ -39,7 +42,7 @@ pushed onto the back stack from any of the above:
 
 ## Top-level destinations
 
-### 1. Boards — home ⬜
+### 1. Boards — home 🚧
 
 The collections list. Answers "what am I tracking?"
 
