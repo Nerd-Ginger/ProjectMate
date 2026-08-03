@@ -42,7 +42,7 @@ pushed onto the back stack from any of the above:
 
 ## Top-level destinations
 
-### 1. Boards — home 🚧
+### 1. Boards — home ✅
 
 The collections list. Answers "what am I tracking?"
 
@@ -226,6 +226,7 @@ Not screens — they preserve the context behind them.
 | Sheet | Notes |
 |---|---|
 | **Quick add** | Global FAB. One text field with light parsing: `!!` urgent, `#tag`, `@board`, `tomorrow`/`fri` |
+| **New board** ✅ | Template picker, showing each template's statuses and their categories before you commit |
 | Status picker | Grouped by category |
 | Date picker | **All-day toggle included** |
 | Tag picker | With inline create |

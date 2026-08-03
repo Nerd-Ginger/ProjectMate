@@ -25,7 +25,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nerdginger.projectmate.di.AppContainer
+import com.nerdginger.projectmate.feature.boards.BoardTemplateSheet
 import com.nerdginger.projectmate.feature.boards.BoardsScreen
 import com.nerdginger.projectmate.feature.boards.BoardsViewModel
 import com.nerdginger.projectmate.nav.Navigator
@@ -60,6 +63,7 @@ fun ProjectMateApp(container: AppContainer) {
 
     val boardsViewModel: BoardsViewModel = viewModel(factory = BoardsViewModel.factory(container))
     val boardsState by boardsViewModel.uiState.collectAsStateWithLifecycle()
+    var showTemplateSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(boardsState.errorMessage) {
         boardsState.errorMessage?.let {
@@ -86,7 +90,7 @@ fun ProjectMateApp(container: AppContainer) {
         },
         floatingActionButton = {
             if (navigator.current is Screen.Boards) {
-                FloatingActionButton(onClick = { /* template picker lands next */ }) {
+                FloatingActionButton(onClick = { showTemplateSheet = true }) {
                     Icon(Icons.Default.Add, contentDescription = "New board")
                 }
             }
@@ -102,6 +106,17 @@ fun ProjectMateApp(container: AppContainer) {
             else -> ComingSoon(
                 label = screen.title(),
                 modifier = Modifier.padding(insets),
+            )
+        }
+
+        if (showTemplateSheet) {
+            BoardTemplateSheet(
+                templates = boardsState.templates,
+                onDismiss = { showTemplateSheet = false },
+                onCreate = { template, name ->
+                    boardsViewModel.createBoard(template, name)
+                    showTemplateSheet = false
+                },
             )
         }
     }

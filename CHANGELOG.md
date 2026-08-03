@@ -11,6 +11,8 @@ Anything a user would notice gets a line here, in the same commit that ships it.
 - Feature-request import: reads the JSON contract the website will serve, with
   per-request error reporting so one bad entry never loses the rest of a batch,
   and deduplication so re-importing the same export changes nothing
+- Create boards from templates — Projects, Life, Feature Requests or Simple —
+  previewing each template's statuses before committing to one
 - Boards home screen showing every collection with a segmented progress bar
   by status category, so a stalled board is visible at a glance
 - Offline database: boards, statuses, items, checklists, tags, links and
