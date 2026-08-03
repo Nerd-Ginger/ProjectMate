@@ -305,3 +305,29 @@ upgrades rather than reinstalls.
 
 **This does not apply to release signing.** A release key must never be
 committed.
+
+---
+
+## D-014 — Temporarily opting out of the AGP 9 DSL
+
+**2026-08-03 · Accepted, with a deliberate expiry**
+
+`gradle.properties` sets `android.newDsl=false`, keeping the app module on the
+Android DSL that preceded AGP 9.
+
+**Considered:** migrating `app/build.gradle.kts` to the new DSL immediately.
+
+**Why not, yet:** AGP 9 introduced built-in Kotlin and a new Android DSL in the
+same release, and the first three CI runs failed on the interaction between
+them. With no way to compile Android code locally (D-006), each blind guess
+costs a full CI round-trip. Changing one thing at a time is the only way to
+learn anything from a red build, so the DSL migration is being separated from
+getting a first green build.
+
+**This is debt, and it is meant to be visible.** `android.newDsl` is a
+transitional flag that AGP will remove. The follow-up is to migrate the
+`android { }` block properly, restore the `packaging`, `testOptions` and `lint`
+blocks that were dropped alongside it, delete the flag, and supersede this
+entry.
+
+**Superseded by:** *(nothing yet — this entry is still live)*
