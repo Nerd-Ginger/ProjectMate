@@ -86,11 +86,17 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: Upload reports
+      # Room writes its schema JSON during the build, and those files are meant
+      # to be committed so migrations can be tested against real historical
+      # versions. Since the build only ever runs here, this is the only way to
+      # get them back out.
+      - name: Upload reports and generated schemas
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: android-reports
           path: |
             app/build/reports/
+            app/schemas/
           retention-days: 7
+          if-no-files-found: ignore
