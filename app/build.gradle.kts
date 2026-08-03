@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.room)
 }
 
 android {
@@ -51,14 +50,10 @@ android {
             versionNameSuffix = "-debug"
             signingConfig = signingConfigs.getByName("debug")
         }
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-        }
+        // The release build type is left at its defaults for now. CI only
+        // assembles debug, and minification settings are another thing to get
+        // wrong while the build is still being stabilised. Configured properly
+        // before there is ever a release to ship.
     }
 
     compileOptions {
@@ -79,10 +74,17 @@ android {
     // this script. They go back in one at a time once the build compiles.
 }
 
-// Room 3 exports its schema JSON here; the directory is committed so that
-// migrations can be tested against real historical schemas.
-room {
-    schemaDirectory("$projectDir/schemas")
+// Room exports its schema JSON here; the directory is committed so migrations
+// can be tested against real historical schemas.
+//
+// Set as a KSP argument rather than through the Room Gradle plugin. The plugin
+// buys a slightly nicer DSL and costs another plugin to resolve, another
+// type-safe accessor to generate, and another thing that can fail in a build
+// that cannot be compiled locally. The compiler argument has done this job for
+// years and needs none of that.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+    arg("room.generateKotlin", "true")
 }
 
 dependencies {

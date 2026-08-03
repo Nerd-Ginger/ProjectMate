@@ -308,26 +308,50 @@ committed.
 
 ---
 
-## D-014 — Temporarily opting out of the AGP 9 DSL
+## D-014 — Superseded: briefly opted out of the AGP 9 DSL
 
-**2026-08-03 · Accepted, with a deliberate expiry**
+**2026-08-03 · Superseded by D-015 the same day**
 
-`gradle.properties` sets `android.newDsl=false`, keeping the app module on the
-Android DSL that preceded AGP 9.
+Set `android.newDsl=false` to keep the app module on the pre-AGP-9 Android DSL,
+intending to migrate later.
 
-**Considered:** migrating `app/build.gradle.kts` to the new DSL immediately.
+**Why it was wrong:** the flag is itself already deprecated — AGP warns that
+`android.newDsl=false` "is deprecated, the current default is true, it will be
+removed in version 10.0". Opting out bought a compatibility mode with a shorter
+remaining life than the thing it was avoiding, and it did not even fix the
+build: with the flag set, the old `android { }` accessor is deprecated at error
+level, so the script still failed to compile.
 
-**Why not, yet:** AGP 9 introduced built-in Kotlin and a new Android DSL in the
-same release, and the first three CI runs failed on the interaction between
-them. With no way to compile Android code locally (D-006), each blind guess
-costs a full CI round-trip. Changing one thing at a time is the only way to
-learn anything from a red build, so the DSL migration is being separated from
-getting a first green build.
+Left here rather than deleted, because "we tried the escape hatch and it was a
+dead end" is worth knowing.
 
-**This is debt, and it is meant to be visible.** `android.newDsl` is a
-transitional flag that AGP will remove. The follow-up is to migrate the
-`android { }` block properly, restore the `packaging`, `testOptions` and `lint`
-blocks that were dropped alongside it, delete the flag, and supersede this
-entry.
+---
 
-**Superseded by:** *(nothing yet — this entry is still live)*
+## D-015 — Use the AGP 9 DSL, and configure Room through KSP
+
+**2026-08-03 · Accepted**
+
+The app module targets the new AGP 9 Android DSL directly, with no compatibility
+flag. The Room schema directory is set as a KSP argument rather than through the
+Room Gradle plugin, which is no longer applied.
+
+**Considered:** staying on the old DSL behind `android.newDsl=false` (D-014).
+
+**Why:** improving the error output came first, and it paid immediately. With
+`--stacktrace` removed, CI reported three specific script-compilation errors
+instead of 120 lines of Gradle internals — a deprecated `android { }` accessor
+and an unresolved `room { schemaDirectory(...) }`. Guessing would not have found
+the second one.
+
+The new DSL is the default and the only one with a future, so going forward
+costs the same as going back and doesn't need doing twice.
+
+**Dropping the Room Gradle plugin** is the same trade as D-004 and D-010: it
+buys a marginally nicer DSL in exchange for another plugin to resolve, another
+type-safe accessor to generate, and another failure mode in a build that cannot
+be compiled locally. `ksp { arg("room.schemaLocation", …) }` has done the job
+for years and needs none of it.
+
+The `release` build type is also left at its defaults for now. CI only assembles
+debug, and minification is another thing to get wrong while the build is being
+stabilised; it will be configured before there is ever a release to ship.
