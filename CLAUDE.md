@@ -66,6 +66,11 @@ What this means in practice:
   `chore:`, `refactor:`, `test:`. Scope where useful — `feat(core):`.
 - Commit in coherent increments. Each commit should leave the tree in a state
   that at least intends to build.
+- **Never write `[skip ci]` in a commit message unless you mean it.** GitHub
+  matches that token anywhere in the message, including prose. A commit that
+  merely *described* the schema-export step silently skipped its own build, and
+  since CI is the only compiler here, a skipped build looks exactly like a
+  passing one. Refer to it as "the skip-ci marker" instead.
 - Work happens on `claude/android-project-tracker-bizgrj`. Never push to `main`
   without being asked.
 
