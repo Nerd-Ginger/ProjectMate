@@ -73,24 +73,10 @@ android {
         compose = true
     }
 
-    packaging {
-        resources.excludes += setOf(
-            "/META-INF/{AL2.0,LGPL2.1}",
-            "/META-INF/LICENSE*",
-        )
-    }
-
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-        }
-    }
-
-    lint {
-        warningsAsErrors = false
-        abortOnError = true
-        checkReleaseBuilds = false
-    }
+    // packaging {}, testOptions {} and lint {} are deliberately absent until the
+    // first green build. Each is a convenience rather than a requirement, and
+    // each is a candidate for the AGP 9 DSL change that is currently breaking
+    // this script. They go back in one at a time once the build compiles.
 }
 
 // Room 3 exports its schema JSON here; the directory is committed so that
@@ -126,7 +112,7 @@ dependencies {
 
     // Room 3 runs on the JVM via the bundled SQLite driver, so DAO and
     // migration tests are plain unit tests — no emulator required.
-    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlin.test)
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.kotlinx.coroutines.test)

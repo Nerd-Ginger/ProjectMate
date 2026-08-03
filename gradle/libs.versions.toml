@@ -54,6 +54,10 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 # Test
+# Explicit coordinate rather than the kotlin("test") DSL helper, which is only
+# reliably present where the Kotlin Gradle plugin is applied — and :app now
+# relies on AGP's built-in Kotlin instead.
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
