@@ -7,7 +7,7 @@ import androidx.room3.Transaction
 import androidx.room3.Update
 import androidx.room3.Upsert
 import com.nerdginger.projectmate.data.entity.BoardEntity
-import com.nerdginger.projectmate.data.entity.StatusEntity
+import com.nerdginger.projectmate.data.relation.BoardWithStatuses
 import kotlinx.coroutines.flow.Flow
 
 /** Per-board counts of open items by status category, for progress bars. */
@@ -101,10 +101,3 @@ interface BoardDao {
     @Query("SELECT * FROM boards WHERE id = :id AND deletedAt IS NULL")
     fun observeWithStatuses(id: String): Flow<BoardWithStatuses?>
 }
-
-/** A board plus its columns, loaded in one round trip. */
-data class BoardWithStatuses(
-    @androidx.room3.Embedded val board: BoardEntity,
-    @androidx.room3.Relation(parentColumn = "id", entityColumn = "boardId")
-    val statuses: List<StatusEntity>,
-)
