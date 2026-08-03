@@ -8,6 +8,9 @@ Anything a user would notice gets a line here, in the same commit that ships it.
 ## [Unreleased]
 
 ### Added
+- Feature-request import: reads the JSON contract the website will serve, with
+  per-request error reporting so one bad entry never loses the rest of a batch,
+  and deduplication so re-importing the same export changes nothing
 - Repository scaffolding: `.gitignore`, `.editorconfig`, and contributor
   conventions in `CLAUDE.md`
 - Documentation set: purpose and non-goals, roadmap, architecture, data model,

@@ -13,19 +13,19 @@ The goal: an app that is genuinely usable every day with no server involved.
 ### Foundation
 
 - ✅ Repository scaffolding, conventions, `.gitignore`
-- 🚧 Documentation set (purpose, architecture, data model, infrastructure)
-- ⬜ Gradle build — version catalog, `:core` (pure JVM) + `:app` (Android)
+- ✅ Documentation set (purpose, architecture, data model, infrastructure)
+- ✅ Gradle build — version catalog, `:core` (pure JVM) + `:app` (Android)
 - ⬜ GitHub Actions CI producing a downloadable debug APK
 
 ### Core logic (`:core`, locally testable)
 
-- ⬜ Domain models — collections, statuses, items, tags, checklists
-- ⬜ Status categories (`Backlog`/`Active`/`Blocked`/`Done`/`Cancelled`) and the
+- ✅ Domain models — collections, statuses, items, tags, checklists
+- ✅ Status categories (`Backlog`/`Active`/`Blocked`/`Done`/`Cancelled`) and the
   focus flag
-- ⬜ Board templates — Projects, Life, Feature Requests, Simple
-- ⬜ Today rules — what counts as needing attention today
-- ⬜ Backup JSON schema (full export/import)
-- ⬜ Feature-request JSON schema and importer, with dedup
+- ✅ Board templates — Projects, Life, Feature Requests, Simple
+- ✅ Today rules — what counts as needing attention today
+- ✅ Backup JSON schema (full export/import)
+- ✅ Feature-request JSON schema and importer, with dedup
 
 ### Data (`:app`)
 

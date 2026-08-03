@@ -142,10 +142,15 @@ offers to remember it.
 `feature_request_meta` row holding the requester details, votes, and the
 **verbatim original JSON**. Tags are created if they don't exist.
 
-**Re-import:** matched on `externalRequestId`. A newer `updatedAt` updates the
-item; anything else is skipped. Local edits to `title`/`notes` are never
-clobbered by a re-import — the portal is a source of new requests, not the owner
-of your triage.
+**Re-import:** matched on `externalRequestId`. A newer `updatedAt` refreshes the
+request's **portal-owned metadata only** — votes, requester details, and the
+stored raw payload. Anything else is skipped.
+
+Title, notes and status are never touched by a re-import. The portal is a source
+of new requests, not the owner of your triage: a re-import that silently
+reverted a retitle or a status change would make the app untrustworthy. This is
+structural rather than a rule to remember — the update path carries no `Item` at
+all, so there is nothing to clobber with.
 
 ---
 
