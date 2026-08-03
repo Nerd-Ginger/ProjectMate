@@ -11,6 +11,8 @@ Anything a user would notice gets a line here, in the same commit that ships it.
 - Feature-request import: reads the JSON contract the website will serve, with
   per-request error reporting so one bad entry never loses the rest of a batch,
   and deduplication so re-importing the same export changes nothing
+- Offline database: boards, statuses, items, checklists, tags, links and
+  feature-request metadata, with first-run seeding of the system Inbox
 - Repository scaffolding: `.gitignore`, `.editorconfig`, and contributor
   conventions in `CLAUDE.md`
 - Documentation set: purpose and non-goals, roadmap, architecture, data model,

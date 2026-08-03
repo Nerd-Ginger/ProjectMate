@@ -1,8 +1,8 @@
 package com.nerdginger.projectmate.di
 
 import android.content.Context
+import com.nerdginger.projectmate.data.DatabaseSeeder
 import com.nerdginger.projectmate.data.ProjectMateDatabase
-import com.nerdginger.projectmate.data.dao.AppMetaDao
 
 /**
  * The dependency graph, wired by hand.
@@ -16,5 +16,17 @@ class AppContainer(context: Context) {
 
     val database: ProjectMateDatabase by lazy { ProjectMateDatabase.build(appContext) }
 
-    val appMetaDao: AppMetaDao by lazy { database.appMetaDao() }
+    val boardDao by lazy { database.boardDao() }
+    val statusDao by lazy { database.statusDao() }
+    val itemDao by lazy { database.itemDao() }
+    val checklistDao by lazy { database.checklistDao() }
+    val tagDao by lazy { database.tagDao() }
+    val itemLinkDao by lazy { database.itemLinkDao() }
+    val featureRequestMetaDao by lazy { database.featureRequestMetaDao() }
+    val savedViewDao by lazy { database.savedViewDao() }
+    val appMetaDao by lazy { database.appMetaDao() }
+
+    val seeder: DatabaseSeeder by lazy {
+        DatabaseSeeder(boardDao, statusDao, appMetaDao)
+    }
 }

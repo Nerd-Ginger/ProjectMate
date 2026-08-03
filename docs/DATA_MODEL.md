@@ -165,7 +165,11 @@ actual work item on a Projects board.
 
 `itemId` PK / FK CASCADE · `requesterName: String?` · `requesterEmail: String?`
 · `contactOptIn: Boolean` · `votes: Int` · `portalSlug: String?` ·
-`submittedAt: Long` · `rawPayloadJson: String` · `SyncMeta`
+`sourceUrl: String?` · `submittedAt: Long` · `importedUpdatedAt: Long?` ·
+`rawPayloadJson: String` · `SyncMeta`
+
+`importedUpdatedAt` is the request's own `updatedAt` as last imported, and is
+the comparison key that makes a re-import a no-op.
 
 Keeps portal fields and personal data out of the hot `items` table.
 `rawPayloadJson` stores the original request verbatim — you can't lose fields
@@ -213,7 +217,11 @@ Single row: `deviceId` (UUID, minted on first run) · `lastSyncAt: Long?` ·
 
 | Version | Date | Change |
 |---|---|---|
-| 1 | *pending* | Initial schema |
+| 1 | 2026-08-03 | Initial schema — 11 tables |
+
+Schema JSON under `app/schemas/` is generated during the build and committed
+by CI. It cannot be produced locally: Room'''s compiler comes from Google'''s Maven
+repository, which is unreachable in the development container (D-006).
 
 Search is `LIKE`-based in v1. An FTS4 table over `items(title, notes)` is
 planned as v2, partly to exercise the migration path deliberately before a

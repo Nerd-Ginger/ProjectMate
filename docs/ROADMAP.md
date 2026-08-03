@@ -29,9 +29,9 @@ The goal: an app that is genuinely usable every day with no server involved.
 
 ### Data (`:app`)
 
-- ⬜ Room entities, DAOs, database, type converters
-- ⬜ Exported schemas committed under `app/schemas/`
-- ⬜ First-run seeding — Inbox system collection
+- ✅ Room entities, DAOs, database (no type converters needed)
+- ✅ Exported schemas committed under `app/schemas/` (by CI)
+- ✅ First-run seeding — Inbox system collection
 - ⬜ Repositories and `AppContainer` DI
 
 ### Interface
