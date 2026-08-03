@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-        A bare splash-through theme. All real theming happens in Compose
+        A bare launch theme. All real theming happens in Compose
         (designsystem/Theme.kt); this exists only so the window has sane
-        colours before the first frame.
+        colours before the first frame is drawn.
+
+        The parent is a plain framework theme. There is no DayNight variant in
+        the platform — those come from AppCompat or Material Components, and
+        this app is pure Compose and uses neither. Light and dark are handled
+        by pairing this with values-night/themes.xml instead.
+
+        No statusBarColor or navigationBarColor: both are no-ops from API 35,
+        and enableEdgeToEdge() in MainActivity handles the system bars.
     -->
-    <style name="Theme.ProjectMate" parent="android:Theme.Material.DayNight.NoActionBar">
+    <style name="Theme.ProjectMate" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/window_background</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 </resources>
