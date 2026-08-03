@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        A bare splash-through theme. All real theming happens in Compose
+        (designsystem/Theme.kt); this exists only so the window has sane
+        colours before the first frame.
+    -->
+    <style name="Theme.ProjectMate" parent="android:Theme.Material.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

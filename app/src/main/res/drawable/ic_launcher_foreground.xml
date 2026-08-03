@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Three stacked cards of decreasing completeness — a board, abstracted.
+    Placeholder art; replace when there is a real icon.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,34h48a3,3 0 0 1 3,3v6a3,3 0 0 1 -3,3H30a3,3 0 0 1 -3,-3v-6a3,3 0 0 1 3,-3z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.75"
+        android:pathData="M30,51h34a3,3 0 0 1 3,3v6a3,3 0 0 1 -3,3H30a3,3 0 0 1 -3,-3v-6a3,3 0 0 1 3,-3z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.5"
+        android:pathData="M30,68h20a3,3 0 0 1 3,3v6a3,3 0 0 1 -3,3H30a3,3 0 0 1 -3,-3v-6a3,3 0 0 1 3,-3z" />
+</vector>

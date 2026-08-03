@@ -34,5 +34,10 @@ Thumbs.db
 *.keystore
 keystore.properties
 
+# ...except the debug keystore, which is deliberately committed so CI-built
+# APKs are signed with a stable key and can be installed over each other.
+# Debug keystores are non-secret by design. See docs/DECISIONS.md D-013.
+!debug.keystore
+
 # Logs
 *.log
