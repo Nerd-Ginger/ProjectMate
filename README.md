@@ -76,6 +76,7 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for why it's split this way.
 | Document | What's in it |
 |---|---|
 | [`docs/PURPOSE.md`](docs/PURPOSE.md) | What this tool is for, its principles, and its non-goals |
+| [`docs/SITEMAP.md`](docs/SITEMAP.md) | Every screen and sheet, with build status — the UI design reference |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Phased plan — what's shipped, what's next |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Module split, layers, data flow |
 | [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) | Every table and field, and why |
