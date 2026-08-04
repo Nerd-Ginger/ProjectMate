@@ -23,20 +23,51 @@ Shipping a feature also means ticking it off in `docs/ROADMAP.md`.
 
 ## Build environment
 
-**The development container cannot build Android.** `dl.google.com` — which
-serves both the Android SDK and Google's Maven repository — is blocked by
-network policy, and no SDK is installed. Verified, not assumed.
+This repo gets worked on from two very different places, and they have opposite
+capabilities. **Work out which one you're in before believing anything about
+what you can build.**
 
-What this means in practice:
+| | `./gradlew :core:test` | Android build (`:app`) |
+|---|---|---|
+| **A machine with Android Studio** | works | **works** — build and run on a device directly |
+| **A cloud container** (no SDK, `dl.google.com` blocked) | works | **CI only** |
 
-- `./gradlew :core:test` **works locally**. The `:core` module is pure Kotlin
-  and resolves entirely from Maven Central.
+`:core` is pure Kotlin and resolves entirely from Maven Central, so it tests
+anywhere. Everything else depends on the Android SDK.
+
+### `:app` is conditionally included — this will confuse you once
+
+`settings.gradle.kts` includes `:app` **only** when one of these is true:
+
+- `ANDROID_HOME` is set
+- `ANDROID_SDK_ROOT` is set
+- `local.properties` exists in the repo root
+- `PROJECTMATE_FORCE_ANDROID=true`
+
+None of them present and `:app` is silently not part of the build.
+`./gradlew :app:assembleDebug` then fails with **"project not found"**, which
+reads like a broken checkout rather than a missing SDK. Gradle does log
+`No Android SDK detected — skipping :app` during configuration, but it scrolls
+past easily. If `:app` seems to have vanished, check the SDK before you check
+anything else. (See `docs/DECISIONS.md` D-006.)
+
+### On a machine with Android Studio
+
+Build and run it. Don't route work through CI that you can validate in seconds
+on a device — and don't trust a screen you've only compiled. See
+`docs/LOCAL_SETUP.md` for setup and an acceptance walkthrough.
+
+### In a cloud container
+
 - Everything Android — compiling, Room codegen, lint, the APK — **only happens
   in GitHub Actions**. CI is the compiler.
 - Put logic worth testing in `:core` wherever it's reasonable. It's the only
   place with a fast feedback loop.
 - Expect to iterate on CI failures by reading job logs. Keep pushes small so a
   red build points at a small diff.
+- **Read the literal error text before forming a theory about it.** A confident
+  wrong diagnosis costs a full CI round-trip here; the error has twice already
+  named the actual cause while a plausible-sounding guess did not.
 
 ## Module boundaries
 
@@ -68,15 +99,18 @@ What this means in practice:
   that at least intends to build.
 - **Never write `[skip ci]` in a commit message unless you mean it.** GitHub
   matches that token anywhere in the message, including prose. A commit that
-  merely *described* the schema-export step silently skipped its own build, and
-  since CI is the only compiler here, a skipped build looks exactly like a
-  passing one. Refer to it as "the skip-ci marker" instead.
+  merely *described* the schema-export step silently skipped its own build. A
+  skipped build looks exactly like a passing one — and where CI is the only
+  compiler, nothing else would have caught it. Refer to it as "the skip-ci
+  marker" instead.
 - Work happens on `claude/android-project-tracker-bizgrj`. Never push to `main`
   without being asked.
 
 ## Before you call something done
 
-1. `./gradlew :core:test` locally if `:core` changed
-2. Push and confirm the CI run goes green — a red build is not "done"
-3. Docs updated per the table above
-4. `CHANGELOG.md` has an entry if a user would notice the change
+1. `./gradlew :core:test` if `:core` changed
+2. **If you can run the app, run it.** Compiling is not evidence that a screen
+   works. Anything user-visible gets looked at on a device before it's "done"
+3. Push and confirm the CI run goes green — a red build is not "done"
+4. Docs updated per the table above
+5. `CHANGELOG.md` has an entry if a user would notice the change
