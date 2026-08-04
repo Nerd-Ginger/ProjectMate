@@ -2,30 +2,48 @@ package com.nerdginger.projectmate.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.nerdginger.projectmate.core.model.BoardProgress
 import com.nerdginger.projectmate.core.model.StatusCategory
+import com.nerdginger.projectmate.designsystem.LocalProjectMateTokens
 import com.nerdginger.projectmate.designsystem.ProjectMateTheme
 
-/** Colour for a status category, used anywhere progress is shown. */
-fun StatusCategory.indicatorColor(): Color = when (this) {
-    StatusCategory.INBOX -> Color(0xFF94A3B8)
-    StatusCategory.BACKLOG -> Color(0xFF64748B)
-    StatusCategory.ACTIVE -> Color(0xFF6366F1)
-    StatusCategory.BLOCKED -> Color(0xFFEF4444)
-    StatusCategory.DONE -> Color(0xFF22C55E)
-    StatusCategory.CANCELLED -> Color(0xFF78716C)
+/**
+ * Colour for a status category, from the design comp's palette.
+ *
+ * Active is the accent orange: in-flight work is what the accent exists for.
+ * Inbox and cancelled reuse neutrals rather than inventing hues the comp
+ * doesn't have.
+ */
+@Composable
+fun StatusCategory.indicatorColor(): Color {
+    val t = LocalProjectMateTokens.current
+    return when (this) {
+        StatusCategory.INBOX -> t.backlog
+        StatusCategory.BACKLOG -> t.backlog
+        StatusCategory.ACTIVE -> t.active
+        StatusCategory.BLOCKED -> t.blocked
+        StatusCategory.DONE -> t.done
+        StatusCategory.CANCELLED -> t.done
+    }
 }
 
 /**
@@ -42,8 +60,9 @@ fun StatusCategory.indicatorColor(): Color = when (this) {
 fun BoardProgressBar(
     progress: BoardProgress,
     modifier: Modifier = Modifier,
-    height: androidx.compose.ui.unit.Dp = 6.dp,
+    height: Dp = 6.dp,
 ) {
+    val tokens = LocalProjectMateTokens.current
     val segments = SEGMENT_ORDER.mapNotNull { category ->
         val count = progress.countsByCategory[category] ?: 0
         if (count > 0) category to count else null
@@ -53,20 +72,76 @@ fun BoardProgressBar(
         modifier = modifier
             .fillMaxWidth()
             .height(height)
-            .clip(RoundedCornerShape(percent = 50))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
-        horizontalArrangement = Arrangement.spacedBy(1.dp),
+            .clip(RoundedCornerShape(height / 2))
+            .background(tokens.track),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         segments.forEach { (category, count) ->
-            androidx.compose.foundation.layout.Box(
+            Box(
                 Modifier
                     .weight(count.toFloat())
-                    .fillMaxWidth()
-                    .height(height)
+                    .fillMaxHeight()
                     .background(category.indicatorColor()),
             )
         }
     }
+}
+
+/**
+ * The count-per-category row beneath the bar — "2 backlog · 2 active · …".
+ *
+ * Blocked is the one entry that colours its label as well as its swatch. It's
+ * the only category the design lets shout, and it's the one worth noticing.
+ */
+@Composable
+fun BoardProgressLegend(
+    progress: BoardProgress,
+    modifier: Modifier = Modifier,
+) {
+    val tokens = LocalProjectMateTokens.current
+    val entries = LEGEND_ORDER.map { category ->
+        category to (progress.countsByCategory[category] ?: 0)
+    }
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        entries.forEach { (category, count) ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    Modifier
+                        .size(6.dp)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(category.indicatorColor()),
+                )
+                Text(
+                    text = "$count ${category.legendLabel()}",
+                    style = tokens.mono.copy(
+                        fontSize = 10.sp,
+                        color = if (category == StatusCategory.BLOCKED && count > 0) {
+                            tokens.blockedText
+                        } else {
+                            tokens.mono.color
+                        },
+                    ),
+                )
+            }
+        }
+    }
+}
+
+private fun StatusCategory.legendLabel(): String = when (this) {
+    StatusCategory.INBOX -> "inbox"
+    StatusCategory.BACKLOG -> "backlog"
+    StatusCategory.ACTIVE -> "active"
+    StatusCategory.BLOCKED -> "blocked"
+    StatusCategory.DONE -> "done"
+    StatusCategory.CANCELLED -> "cancelled"
 }
 
 private val SEGMENT_ORDER = listOf(
@@ -78,20 +153,29 @@ private val SEGMENT_ORDER = listOf(
     StatusCategory.CANCELLED,
 )
 
-@Preview(showBackground = true, widthDp = 320)
+/** The four the comp shows. Inbox and cancelled aren't worth a slot here. */
+private val LEGEND_ORDER = listOf(
+    StatusCategory.BACKLOG,
+    StatusCategory.ACTIVE,
+    StatusCategory.BLOCKED,
+    StatusCategory.DONE,
+)
+
+@Preview(showBackground = true, widthDp = 320, backgroundColor = 0xFF0B0B0C)
 @Composable
 private fun BoardProgressBarPreview() {
-    ProjectMateTheme(dynamicColor = false) {
-        BoardProgressBar(
-            progress = BoardProgress(
-                mapOf(
-                    StatusCategory.BACKLOG to 4,
-                    StatusCategory.ACTIVE to 2,
-                    StatusCategory.BLOCKED to 1,
-                    StatusCategory.DONE to 5,
-                ),
+    ProjectMateTheme {
+        val progress = BoardProgress(
+            mapOf(
+                StatusCategory.BACKLOG to 4,
+                StatusCategory.ACTIVE to 2,
+                StatusCategory.BLOCKED to 1,
+                StatusCategory.DONE to 5,
             ),
-            modifier = Modifier.padding(16.dp),
         )
+        androidx.compose.foundation.layout.Column(Modifier.padding(16.dp)) {
+            BoardProgressBar(progress)
+            BoardProgressLegend(progress, Modifier.padding(top = 9.dp))
+        }
     }
 }

@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #08080A; }
+  a { color: #FF6B1A; text-decoration: none; }
+  a:hover { color: #FF8A4C; }
+  *::-webkit-scrollbar { width: 0; height: 0; }
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;gap:40px;padding:40px;box-sizing:border-box;justify-content:center;align-items:flex-start;background:#08080A;font-family:Roboto, system-ui, sans-serif">
+  <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{ true }}" hint-size="428px,908px">
+    <div style="position:relative;height:812px;display:flex;flex-direction:column;background:#0B0B0C;color:#F2F0EE;overflow:hidden">
+
+      <sc-if value="{{ atBoards }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:8px;padding:14px 8px 8px 20px">
+            <div style="flex:1">
+              <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.18em;color:#FF6B1A;text-transform:uppercase">Projectmate</div>
+              <div style="font-size:26px;font-weight:500;letter-spacing:-0.2px;margin-top:2px">Boards</div>
+            </div>
+            <div onClick="{{ openHomeOverflow }}" style="width:44px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border-radius:22px" style-hover="background:rgba(255,255,255,0.06)">
+              <div style="width:3px;height:3px;border-radius:2px;background:#93908C"></div>
+              <div style="width:3px;height:3px;border-radius:2px;background:#93908C"></div>
+              <div style="width:3px;height:3px;border-radius:2px;background:#93908C"></div>
+            </div>
+          </div>
+
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:0 0 96px">
+            <div style="display:flex;gap:8px;padding:6px 20px 16px;overflow-x:auto">
+              <sc-for list="{{ smartChips }}" as="c" hint-placeholder-count="3">
+                <div onClick="{{ c.open }}" style="flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:#141419;cursor:pointer" style-hover="border-color:rgba(255,107,26,0.5)">
+                  <div style="width:6px;height:6px;border-radius:3px;background:{{ c.dot }}"></div>
+                  <div style="font-size:13px;font-weight:500">{{ c.name }}</div>
+                  <div style="font-family:'JetBrains Mono', monospace;font-size:11px;color:#93908C">{{ c.count }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <sc-for list="{{ boardGroups }}" as="g" hint-placeholder-count="2">
+              <div style="padding:0 20px 22px">
+                <div style="display:flex;align-items:center;gap:10px;padding:0 0 10px">
+                  <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6E6B67">{{ g.name }}</div>
+                  <div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <sc-for list="{{ g.boards }}" as="b" hint-placeholder-count="3">
+                    <div onClick="{{ b.open }}" style="padding:14px;border-radius:14px;background:#141419;border:1px solid rgba(255,255,255,0.07);cursor:pointer" style-hover="border-color:rgba(255,255,255,0.16)">
+                      <div style="display:flex;align-items:center;gap:12px">
+                        <div style="width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono', monospace;font-size:12px;font-weight:700;letter-spacing:0.04em;color:{{ b.accent }};background:{{ b.accentBg }}">{{ b.code }}</div>
+                        <div style="flex:1;min-width:0">
+                          <div style="font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.name }}</div>
+                          <div style="font-family:'JetBrains Mono', monospace;font-size:11px;color:#7E7B77;margin-top:2px">{{ b.meta }}</div>
+                        </div>
+                        <sc-if value="{{ b.pinned }}" hint-placeholder-val="{{ false }}">
+                          <div style="width:8px;height:8px;border-radius:2px;transform:rotate(45deg);background:#FF6B1A"></div>
+                        </sc-if>
+                      </div>
+                      <div style="display:flex;gap:2px;margin-top:13px;height:6px;border-radius:3px;overflow:hidden;background:#1D1D23">
+                        <sc-for list="{{ b.segs }}" as="s" hint-placeholder-count="4">
+                          <div style="width:{{ s.w }};background:{{ s.color }}"></div>
+                        </sc-for>
+                      </div>
+                      <div style="display:flex;gap:12px;margin-top:9px">
+                        <sc-for list="{{ b.legend }}" as="l" hint-placeholder-count="4">
+                          <div style="display:flex;align-items:center;gap:5px">
+                            <div style="width:6px;height:6px;border-radius:2px;background:{{ l.color }}"></div>
+                            <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:{{ l.text }}">{{ l.label }}</div>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div onClick="{{ openNewBoard }}" style="position:absolute;right:18px;bottom:88px;width:60px;height:60px;border-radius:19px;background:#FF6B1A;color:#0B0B0C;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:400;cursor:pointer;box-shadow:0 8px 24px rgba(255,107,26,0.32)" style-hover="background:#FF8A4C">+</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ atToday }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <div style="padding:14px 20px 10px">
+            <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.18em;color:#FF6B1A;text-transform:uppercase">Mon 3 Aug</div>
+            <div style="font-size:26px;font-weight:500;letter-spacing:-0.2px;margin-top:2px">Today</div>
+          </div>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:6px 0 96px">
+            <sc-if value="{{ todayEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:80px 40px;text-align:center">
+                <div style="width:44px;height:44px;margin:0 auto 18px;border-radius:12px;border:1px solid rgba(255,107,26,0.4);transform:rotate(45deg)"></div>
+                <div style="font-size:17px;font-weight:500">Nothing needs you today</div>
+                <div style="font-size:13px;color:#7E7B77;margin-top:6px;line-height:1.5;text-wrap:pretty">Six items are due later this week. Today is clear.</div>
+              </div>
+            </sc-if>
+            <sc-for list="{{ todaySections }}" as="sec" hint-placeholder-count="3">
+              <div style="padding:0 20px 20px">
+                <div style="display:flex;align-items:baseline;gap:8px;padding-bottom:8px">
+                  <div style="font-size:13px;font-weight:700;letter-spacing:0.02em;color:{{ sec.color }}">{{ sec.title }}</div>
+                  <div style="font-family:'JetBrains Mono', monospace;font-size:11px;color:#6E6B67">{{ sec.count }}</div>
+                  <div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="3">
+                    <div onClick="{{ r.open }}" style="display:flex;align-items:flex-start;gap:11px;padding:12px 13px;border-radius:12px;background:#141419;border:1px solid rgba(255,255,255,0.06);cursor:pointer" style-hover="border-color:rgba(255,255,255,0.16)">
+                      <div style="width:26px;height:26px;flex:0 0 auto;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono', monospace;font-size:10px;font-weight:700;color:{{ r.accent }};background:{{ r.accentBg }}">{{ r.code }}</div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:14px;line-height:1.35;text-wrap:pretty">{{ r.title }}</div>
+                        <div style="display:flex;align-items:center;gap:8px;margin-top:7px;flex-wrap:wrap">
+                          <div style="display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;background:{{ r.statusBg }}">
+                            <div style="width:5px;height:5px;border-radius:3px;background:{{ r.statusColor }}"></div>
+                            <div style="font-size:11px;color:#C9C6C2">{{ r.statusName }}</div>
+                          </div>
+                          <sc-if value="{{ r.hasDue }}" hint-placeholder-val="{{ false }}">
+                            <div style="font-family:'JetBrains Mono', monospace;font-size:10px;padding:3px 7px;border-radius:6px;color:{{ r.dueColor }};background:{{ r.dueBg }}">{{ r.dueText }}</div>
+                          </sc-if>
+                        </div>
+                      </div>
+                      <sc-if value="{{ r.urgent }}" hint-placeholder-val="{{ false }}">
+                        <div style="width:7px;height:7px;border-radius:4px;background:#FF6B1A;margin-top:4px"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ atInbox }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:flex-end;gap:8px;padding:14px 14px 10px 20px">
+            <div style="flex:1">
+              <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.18em;color:#FF6B1A;text-transform:uppercase">Capture</div>
+              <div style="font-size:26px;font-weight:500;letter-spacing:-0.2px;margin-top:2px">Inbox</div>
+            </div>
+            <div onClick="{{ openImport }}" style="padding:8px 13px;border-radius:18px;border:1px solid rgba(255,255,255,0.14);font-size:12px;font-weight:500;cursor:pointer" style-hover="border-color:#FF6B1A;color:#FF6B1A">Import file</div>
+            <div onClick="{{ toggleBulk }}" style="padding:8px 13px;border-radius:18px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid {{ bulkBorder }};color:{{ bulkColor }}">Select</div>
+          </div>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:6px 0 96px">
+            <sc-for list="{{ inboxGroups }}" as="g" hint-placeholder-count="3">
+              <div style="padding:0 20px 20px">
+                <div style="display:flex;align-items:center;gap:8px;padding-bottom:8px">
+                  <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6E6B67">{{ g.name }}</div>
+                  <div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="2">
+                    <div style="padding:13px;border-radius:12px;background:#141419;border:1px solid {{ r.border }}">
+                      <div style="display:flex;align-items:flex-start;gap:11px">
+                        <sc-if value="{{ bulkMode }}" hint-placeholder-val="{{ false }}">
+                          <div onClick="{{ r.toggleSel }}" style="width:20px;height:20px;flex:0 0 auto;border-radius:5px;margin-top:1px;cursor:pointer;border:1.5px solid {{ r.selBorder }};background:{{ r.selBg }};display:flex;align-items:center;justify-content:center;font-size:12px;color:#0B0B0C;font-weight:700">{{ r.selMark }}</div>
+                        </sc-if>
+                        <div style="flex:1;min-width:0">
+                          <div style="font-size:14px;font-weight:500;line-height:1.35;text-wrap:pretty">{{ r.title }}</div>
+                          <div style="font-size:12px;color:#7E7B77;margin-top:5px;line-height:1.45;text-wrap:pretty">{{ r.body }}</div>
+                          <div style="display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap">
+                            <div style="font-family:'JetBrains Mono', monospace;font-size:10px;padding:3px 7px;border-radius:5px;border:1px solid rgba(255,255,255,0.12);color:#93908C">{{ r.sourceBadge }}</div>
+                            <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#7E7B77">{{ r.meta }}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div style="display:flex;gap:7px;margin-top:12px">
+                        <div onClick="{{ r.move }}" style="flex:1;text-align:center;padding:8px 0;border-radius:9px;background:rgba(255,107,26,0.14);color:#FF6B1A;font-size:12px;font-weight:500;cursor:pointer" style-hover="background:rgba(255,107,26,0.24)">Move to board</div>
+                        <div onClick="{{ r.tag }}" style="padding:8px 12px;border-radius:9px;background:#1D1D23;font-size:12px;color:#C9C6C2;cursor:pointer" style-hover="background:#26262E">Tag</div>
+                        <div onClick="{{ r.dismiss }}" style="padding:8px 12px;border-radius:9px;background:#1D1D23;font-size:12px;color:#C9C6C2;cursor:pointer" style-hover="background:#26262E">Dismiss</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ inboxEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:80px 40px;text-align:center">
+                <div style="font-size:17px;font-weight:500">Inbox clear</div>
+                <div style="font-size:13px;color:#7E7B77;margin-top:6px">Everything captured has a board.</div>
+              </div>
+            </sc-if>
+          </div>
+          <sc-if value="{{ bulkMode }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;left:14px;right:14px;bottom:88px;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#1D1D23;border:1px solid rgba(255,255,255,0.1)">
+              <div style="font-family:'JetBrains Mono', monospace;font-size:11px;color:#93908C">{{ selCount }} selected</div>
+              <div style="flex:1"></div>
+              <div onClick="{{ bulkMove }}" style="padding:7px 11px;border-radius:8px;background:rgba(255,107,26,0.16);color:#FF6B1A;font-size:12px;font-weight:500;cursor:pointer">Move</div>
+              <div onClick="{{ bulkDismiss }}" style="padding:7px 11px;border-radius:8px;background:#26262E;font-size:12px;cursor:pointer">Dismiss</div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ atSearch }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <div style="padding:16px 20px 8px">
+            <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:14px;background:#141419;border:1px solid rgba(255,255,255,0.1)">
+              <div style="width:13px;height:13px;border-radius:7px;border:1.5px solid #93908C;flex:0 0 auto"></div>
+              <input value="{{ query }}" onChange="{{ setQuery }}" placeholder="Title and notes" style="flex:1;background:transparent;border:0;outline:none;color:#F2F0EE;font-size:15px;font-family:Roboto, system-ui, sans-serif" />
+              <sc-if value="{{ canSaveView }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ saveView }}" style="font-size:12px;font-weight:500;color:#FF6B1A;cursor:pointer;white-space:nowrap">Save as view</div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="display:flex;gap:7px;padding:8px 20px 12px;overflow-x:auto">
+            <sc-for list="{{ filterChips }}" as="f" hint-placeholder-count="5">
+              <div onClick="{{ f.toggle }}" style="flex:0 0 auto;padding:7px 12px;border-radius:16px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid {{ f.border }};background:{{ f.bg }};color:{{ f.color }}">{{ f.label }}</div>
+            </sc-for>
+          </div>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:0 0 96px">
+            <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#6E6B67;padding:0 20px 12px">{{ resultCount }}</div>
+            <sc-for list="{{ searchGroups }}" as="g" hint-placeholder-count="2">
+              <div style="padding:0 20px 18px">
+                <div style="display:flex;align-items:center;gap:9px;padding-bottom:8px">
+                  <div style="width:6px;height:6px;border-radius:2px;background:{{ g.accent }}"></div>
+                  <div style="font-size:12px;font-weight:500;color:#C9C6C2">{{ g.name }}</div>
+                  <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#6E6B67">{{ g.count }}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+                    <div onClick="{{ r.open }}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:11px;background:#141419;cursor:pointer" style-hover="background:#1A1A20">
+                      <div style="width:5px;height:5px;border-radius:3px;flex:0 0 auto;background:{{ r.statusColor }}"></div>
+                      <div style="flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.title }}</div>
+                      <sc-if value="{{ r.hasDue }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:{{ r.dueColor }}">{{ r.dueText }}</div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ atBoard }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:6px;padding:10px 10px 8px 6px">
+            <div onClick="{{ back }}" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:20px" style-hover="background:rgba(255,255,255,0.06)">
+              <div style="width:9px;height:9px;border-left:1.6px solid #F2F0EE;border-bottom:1.6px solid #F2F0EE;transform:rotate(45deg)"></div>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:17px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ bd.name }}</div>
+              <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#7E7B77;margin-top:1px">{{ bd.meta }}</div>
+            </div>
+            <div onClick="{{ bd.overflow }}" style="width:40px;height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border-radius:20px" style-hover="background:rgba(255,255,255,0.06)">
+              <div style="width:3px;height:3px;border-radius:2px;background:#93908C"></div>
+              <div style="width:3px;height:3px;border-radius:2px;background:#93908C"></div>
+              <div style="width:3px;height:3px;border-radius:2px;background:#93908C"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:2px 14px 12px">
+            <div style="display:flex;gap:3px;padding:3px;border-radius:11px;background:#141419;border:1px solid rgba(255,255,255,0.07)">
+              <sc-for list="{{ bd.modes }}" as="m" hint-placeholder-count="3">
+                <div onClick="{{ m.set }}" style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;background:{{ m.bg }};color:{{ m.color }}">{{ m.name }}</div>
+              </sc-for>
+            </div>
+            <div style="flex:1"></div>
+            <div onClick="{{ bd.groupBy }}" style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#7E7B77;cursor:pointer;padding:6px 8px;border-radius:8px" style-hover="color:#FF6B1A">{{ bd.groupLabel }}</div>
+          </div>
+
+          <sc-if value="{{ bd.isKanban }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;min-height:0;display:flex;gap:12px;overflow-x:auto;padding:0 14px 96px">
+              <sc-for list="{{ bd.cols }}" as="c" hint-placeholder-count="4">
+                <div style="flex:0 0 auto;width:252px;display:flex;flex-direction:column;border-radius:14px;background:{{ c.colBg }};border:1px solid {{ c.colBorder }};overflow:hidden">
+                  <div style="display:flex;align-items:center;gap:8px;padding:12px 13px 10px">
+                    <div style="width:7px;height:7px;border-radius:2px;background:{{ c.color }}"></div>
+                    <div style="font-size:13px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</div>
+                    <div style="font-family:'JetBrains Mono', monospace;font-size:11px;color:{{ c.countColor }}">{{ c.countText }}</div>
+                  </div>
+                  <sc-if value="{{ c.over }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin:0 13px 10px;padding:6px 9px;border-radius:7px;background:rgba(226,69,60,0.14);font-size:11px;color:#FF9B93;line-height:1.35">Over the WIP limit. Nothing is blocked.</div>
+                  </sc-if>
+                  <div style="flex:1;min-height:0;overflow-y:auto;padding:0 10px 12px;display:flex;flex-direction:column;gap:9px">
+                    <sc-for list="{{ c.cards }}" as="k" hint-placeholder-count="3">
+                      <div onClick="{{ k.open }}" style="padding:11px;border-radius:11px;background:#1A1A20;border:1px solid rgba(255,255,255,0.07);cursor:pointer" style-hover="border-color:rgba(255,255,255,0.18)">
+                        <div style="display:flex;align-items:flex-start;gap:8px">
+                          <sc-if value="{{ k.urgent }}" hint-placeholder-val="{{ false }}">
+                            <div style="width:7px;height:7px;border-radius:4px;background:#FF6B1A;margin-top:4px;flex:0 0 auto"></div>
+                          </sc-if>
+                          <div style="flex:1;font-size:13.5px;line-height:1.35;text-wrap:pretty">{{ k.title }}</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:7px;margin-top:9px;flex-wrap:wrap">
+                          <sc-if value="{{ k.hasDue }}" hint-placeholder-val="{{ false }}">
+                            <div style="font-family:'JetBrains Mono', monospace;font-size:10px;padding:3px 6px;border-radius:5px;color:{{ k.dueColor }};background:{{ k.dueBg }}">{{ k.dueText }}</div>
+                          </sc-if>
+                          <div style="display:flex;gap:3px">
+                            <sc-for list="{{ k.tagDots }}" as="t" hint-placeholder-count="2">
+                              <div style="width:6px;height:6px;border-radius:2px;background:{{ t.color }}"></div>
+                            </sc-for>
+                          </div>
+                          <sc-if value="{{ k.hasCheck }}" hint-placeholder-val="{{ false }}">
+                            <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#7E7B77">{{ k.checkText }}</div>
+                          </sc-if>
+                          <div style="flex:1"></div>
+                          <sc-if value="{{ k.canAdvance }}" hint-placeholder-val="{{ false }}">
+                            <div onClick="{{ k.advance }}" title="{{ k.advanceTip }}" style="width:26px;height:22px;border-radius:6px;background:rgba(255,107,26,0.14);color:#FF6B1A;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer" style-hover="background:rgba(255,107,26,0.3)">→</div>
+                          </sc-if>
+                        </div>
+                      </div>
+                    </sc-for>
+                    <div onClick="{{ c.add }}" style="padding:9px;border-radius:10px;border:1px dashed rgba(255,255,255,0.12);color:#7E7B77;font-size:12px;text-align:center;cursor:pointer" style-hover="border-color:#FF6B1A;color:#FF6B1A">Add item</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ bd.isList }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;min-height:0;overflow-y:auto;padding:0 0 96px">
+              <sc-for list="{{ bd.groups }}" as="g" hint-placeholder-count="3">
+                <div style="padding:0 16px 16px">
+                  <div style="display:flex;align-items:center;gap:8px;padding-bottom:7px">
+                    <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#6E6B67">{{ g.name }}</div>
+                    <div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>
+                    <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#6E6B67">{{ g.count }}</div>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:1px;border-radius:11px;overflow:hidden;background:#141419">
+                    <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+                      <div style="display:flex;align-items:center;gap:10px;padding:12px 12px;background:#141419" style-hover="background:#1A1A20">
+                        <div onClick="{{ r.open }}" style="flex:1;min-width:0;cursor:pointer;display:flex;align-items:center;gap:10px">
+                          <div style="width:5px;height:5px;border-radius:3px;flex:0 0 auto;background:{{ r.statusColor }}"></div>
+                          <div style="flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.title }}</div>
+                          <sc-if value="{{ r.hasDue }}" hint-placeholder-val="{{ false }}">
+                            <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:{{ r.dueColor }}">{{ r.dueText }}</div>
+                          </sc-if>
+                        </div>
+                        <div onClick="{{ r.complete }}" title="swipe right to complete" style="width:26px;height:26px;border-radius:7px;background:rgba(111,108,104,0.22);color:#C9C6C2;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer" style-hover="background:rgba(255,107,26,0.22);color:#FF6B1A">✓</div>
+                        <div onClick="{{ r.archive }}" title="swipe left to archive" style="width:26px;height:26px;border-radius:7px;background:rgba(111,108,104,0.22);color:#C9C6C2;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer" style-hover="background:rgba(226,69,60,0.22);color:#FF9B93">↓</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ bd.isAgenda }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;min-height:0;overflow-y:auto;padding:0 0 96px">
+              <sc-for list="{{ bd.buckets }}" as="g" hint-placeholder-count="4">
+                <div style="display:flex;gap:12px;padding:0 16px 14px">
+                  <div style="width:62px;flex:0 0 auto;padding-top:2px">
+                    <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:{{ g.color }}">{{ g.name }}</div>
+                    <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#5E5B57;margin-top:3px">{{ g.count }}</div>
+                  </div>
+                  <div style="flex:1;min-width:0;border-left:1px solid rgba(255,255,255,0.07);padding-left:12px;display:flex;flex-direction:column;gap:7px">
+                    <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="2">
+                      <div onClick="{{ r.open }}" style="padding:11px 12px;border-radius:10px;background:#141419;cursor:pointer" style-hover="background:#1A1A20">
+                        <div style="font-size:14px;line-height:1.35">{{ r.title }}</div>
+                        <div style="display:flex;align-items:center;gap:7px;margin-top:6px">
+                          <div style="width:5px;height:5px;border-radius:3px;background:{{ r.statusColor }}"></div>
+                          <div style="font-size:11px;color:#93908C">{{ r.statusName }}</div>
+                          <sc-if value="{{ r.hasDue }}" hint-placeholder-val="{{ false }}">
+                            <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:{{ r.dueColor }}">{{ r.dueText }}</div>
+                          </sc-if>
+                        </div>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{ g.empty }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:12px;color:#5E5B57;padding:4px 0 8px">—</div>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <div onClick="{{ openQuickAdd }}" style="position:absolute;right:18px;bottom:24px;width:56px;height:56px;border-radius:18px;background:#FF6B1A;color:#0B0B0C;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;box-shadow:0 8px 24px rgba(255,107,26,0.32)" style-hover="background:#FF8A4C">+</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ atItem }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:6px;padding:10px 10px 6px 6px">
+            <div onClick="{{ back }}" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:20px" style-hover="background:rgba(255,255,255,0.06)">
+              <div style="width:9px;height:9px;border-left:1.6px solid #F2F0EE;border-bottom:1.6px solid #F2F0EE;transform:rotate(45deg)"></div>
+            </div>
+            <div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0">
+              <div style="width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono', monospace;font-size:9px;font-weight:700;color:{{ dt.accent }};background:{{ dt.accentBg }}">{{ dt.code }}</div>
+              <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#7E7B77;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ dt.boardName }}</div>
+            </div>
+            <div style="font-family:'JetBrains Mono', monospace;font-size:9px;letter-spacing:0.1em;color:#5E5B57;padding-right:8px">SAVED</div>
+          </div>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:4px 20px 40px">
+            <input value="{{ dt.title }}" onChange="{{ dt.setTitle }}" style="width:100%;box-sizing:border-box;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,0.08);outline:none;color:#F2F0EE;font-size:21px;font-weight:500;font-family:Roboto, system-ui, sans-serif;padding:0 0 10px;line-height:1.3" />
+            <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:14px">
+              <div onClick="{{ dt.pickStatus }}" style="display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:9px;cursor:pointer;background:{{ dt.statusBg }}" style-hover="filter:brightness(1.25)">
+                <div style="width:6px;height:6px;border-radius:3px;background:{{ dt.statusColor }}"></div>
+                <div style="font-size:13px;font-weight:500">{{ dt.statusName }}</div>
+              </div>
+              <div onClick="{{ dt.pickDate }}" style="display:flex;align-items:center;gap:7px;padding:8px 12px;border-radius:9px;cursor:pointer;background:{{ dt.dueBg }}" style-hover="filter:brightness(1.25)">
+                <div style="font-family:'JetBrains Mono', monospace;font-size:11px;color:{{ dt.dueColor }}">{{ dt.dueChip }}</div>
+              </div>
+            </div>
+
+            <div style="margin-top:22px">
+              <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6E6B67;padding-bottom:9px">Priority</div>
+              <div style="display:flex;gap:6px">
+                <sc-for list="{{ dt.prios }}" as="p" hint-placeholder-count="4">
+                  <div onClick="{{ p.set }}" style="flex:1;text-align:center;padding:9px 0;border-radius:9px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid {{ p.border }};background:{{ p.bg }};color:{{ p.color }}">{{ p.name }}</div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="margin-top:22px">
+              <div style="display:flex;align-items:center;gap:8px;padding-bottom:9px">
+                <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6E6B67">Tags</div>
+                <div onClick="{{ dt.pickTags }}" style="font-size:11px;color:#FF6B1A;cursor:pointer">Edit</div>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ dt.tags }}" as="t" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:14px;background:#1D1D23">
+                    <div style="width:6px;height:6px;border-radius:2px;background:{{ t.color }}"></div>
+                    <div style="font-size:12px;color:#C9C6C2">{{ t.name }}</div>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ dt.noTags }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ dt.pickTags }}" style="font-size:12px;color:#5E5B57;cursor:pointer;padding:6px 0">None yet</div>
+                </sc-if>
+              </div>
+            </div>
+
+            <div style="margin-top:22px">
+              <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6E6B67;padding-bottom:9px">Notes</div>
+              <textarea value="{{ dt.notes }}" onChange="{{ dt.setNotes }}" placeholder="Markdown" style="width:100%;box-sizing:border-box;min-height:76px;resize:vertical;background:#141419;border:1px solid rgba(255,255,255,0.07);border-radius:11px;padding:12px;color:#C9C6C2;font-size:13.5px;line-height:1.55;font-family:Roboto, system-ui, sans-serif;outline:none"></textarea>
+            </div>
+
+            <div style="margin-top:22px">
+              <div style="display:flex;align-items:center;gap:8px;padding-bottom:9px">
+                <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6E6B67">Checklist</div>
+                <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#7E7B77">{{ dt.checkText }}</div>
+              </div>
+              <div style="height:4px;border-radius:2px;background:#1D1D23;overflow:hidden;margin-bottom:11px">
+                <div style="height:4px;background:#FF6B1A;width:{{ dt.checkPct }}"></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <sc-for list="{{ dt.checklist }}" as="c" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:11px;padding:9px 4px">
+                    <div style="display:flex;flex-direction:column;gap:2px;cursor:grab">
+                      <div style="width:11px;height:1.5px;background:#4A4A52"></div>
+                      <div style="width:11px;height:1.5px;background:#4A4A52"></div>
+                      <div style="width:11px;height:1.5px;background:#4A4A52"></div>
+                    </div>
+                    <div onClick="{{ c.toggle }}" style="width:19px;height:19px;border-radius:5px;cursor:pointer;flex:0 0 auto;border:1.5px solid {{ c.border }};background:{{ c.bg }};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0B0B0C">{{ c.mark }}</div>
+                    <div onClick="{{ c.toggle }}" style="flex:1;font-size:13.5px;cursor:pointer;color:{{ c.color }};text-decoration:{{ c.strike }}">{{ c.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <sc-if value="{{ dt.hasLinks }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:22px">
+                <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6E6B67;padding-bottom:9px">Linked items</div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <sc-for list="{{ dt.links }}" as="l" hint-placeholder-count="1">
+                    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:#141419">
+                      <div style="font-family:'JetBrains Mono', monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:#FF6B1A;width:52px">{{ l.rel }}</div>
+                      <div style="flex:1;font-size:13px;color:#C9C6C2">{{ l.title }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ dt.isFR }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:22px;padding:14px;border-radius:13px;background:rgba(255,107,26,0.07);border:1px solid rgba(255,107,26,0.25)">
+                <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#FF6B1A">Feature request</div>
+                <div style="display:flex;gap:22px;margin-top:12px">
+                  <div>
+                    <div style="font-family:'JetBrains Mono', monospace;font-size:19px;font-weight:700">{{ dt.frVotes }}</div>
+                    <div style="font-size:11px;color:#7E7B77;margin-top:2px">votes</div>
+                  </div>
+                  <div>
+                    <div style="font-size:13px">{{ dt.frRequester }}</div>
+                    <div style="font-size:11px;color:#7E7B77;margin-top:3px">{{ dt.frDate }}</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:7px;margin-top:14px">
+                  <div onClick="{{ dt.convert }}" style="flex:1;text-align:center;padding:9px 0;border-radius:9px;background:#FF6B1A;color:#0B0B0C;font-size:12.5px;font-weight:500;cursor:pointer" style-hover="background:#FF8A4C">Convert to project task</div>
+                  <div style="padding:9px 12px;border-radius:9px;border:1px solid rgba(255,107,26,0.35);color:#FF6B1A;font-size:12.5px;cursor:pointer">Portal ↗</div>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ dt.hasSource }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:18px;font-family:'JetBrains Mono', monospace;font-size:10px;color:#5E5B57">{{ dt.sourceText }}</div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ atStatusEditor }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:6px;padding:10px 14px 8px 6px">
+            <div onClick="{{ back }}" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:20px" style-hover="background:rgba(255,255,255,0.06)">
+              <div style="width:9px;height:9px;border-left:1.6px solid #F2F0EE;border-bottom:1.6px solid #F2F0EE;transform:rotate(45deg)"></div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:17px;font-weight:500">Statuses</div>
+              <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#7E7B77">{{ se.boardName }}</div>
+            </div>
+          </div>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:4px 16px 40px">
+            <div style="padding:12px 13px;border-radius:11px;background:#141419;border:1px solid rgba(255,255,255,0.07);font-size:12.5px;color:#93908C;line-height:1.5;text-wrap:pretty">
+              A status belongs to a <span style="color:#F2F0EE">category</span>. Rename “In progress” to anything you like — Today, progress bars and saved views keep working, because they read the category, not the name.
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;margin-top:14px">
+              <sc-for list="{{ se.rows }}" as="r" hint-placeholder-count="5">
+                <div style="padding:12px;border-radius:12px;background:#141419;border:1px solid rgba(255,255,255,0.07)">
+                  <div style="display:flex;align-items:center;gap:11px">
+                    <div style="display:flex;flex-direction:column;gap:2.5px;cursor:grab">
+                      <div style="width:12px;height:1.5px;background:#4A4A52"></div>
+                      <div style="width:12px;height:1.5px;background:#4A4A52"></div>
+                      <div style="width:12px;height:1.5px;background:#4A4A52"></div>
+                    </div>
+                    <div onClick="{{ r.pickColor }}" style="width:16px;height:16px;border-radius:5px;cursor:pointer;flex:0 0 auto;background:{{ r.color }}"></div>
+                    <input value="{{ r.name }}" onChange="{{ r.setName }}" style="flex:1;min-width:0;background:transparent;border:0;outline:none;color:#F2F0EE;font-size:14.5px;font-family:Roboto, system-ui, sans-serif" />
+                    <div style="display:flex;flex-direction:column;gap:3px">
+                      <div onClick="{{ r.up }}" style="width:22px;height:16px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:#1D1D23;font-size:9px;color:#93908C;cursor:pointer">▲</div>
+                      <div onClick="{{ r.down }}" style="width:22px;height:16px;display:flex;align-items:center;justify-content:center;border-radius:4px;background:#1D1D23;font-size:9px;color:#93908C;cursor:pointer">▼</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;margin-top:11px;flex-wrap:wrap">
+                    <select value="{{ r.cat }}" onChange="{{ r.setCat }}" style="appearance:none;background:#1D1D23;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#F2F0EE;font-size:12px;padding:7px 10px;font-family:'JetBrains Mono', monospace;outline:none">
+                      <option value="backlog">category: backlog</option>
+                      <option value="active">category: active</option>
+                      <option value="blocked">category: blocked</option>
+                      <option value="done">category: done (terminal)</option>
+                    </select>
+                    <div onClick="{{ r.toggleFocus }}" style="padding:7px 10px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid {{ r.focusBorder }};color:{{ r.focusColor }}">focus</div>
+                    <div onClick="{{ r.cycleWip }}" style="padding:7px 10px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid rgba(255,255,255,0.1);color:#C9C6C2;font-family:'JetBrains Mono', monospace">{{ r.wipText }}</div>
+                    <div style="flex:1"></div>
+                    <div onClick="{{ r.del }}" style="font-size:12px;color:#FF7A70;cursor:pointer;padding:7px 4px">Delete</div>
+                  </div>
+                  <sc-if value="{{ r.isDefault }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#FF6B1A;margin-top:9px">default for new items</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div onClick="{{ se.add }}" style="margin-top:12px;padding:12px;border-radius:11px;border:1px dashed rgba(255,255,255,0.14);text-align:center;font-size:13px;color:#C9C6C2;cursor:pointer" style-hover="border-color:#FF6B1A;color:#FF6B1A">Add status</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ atSimple }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:6px;padding:10px 14px 8px 6px">
+            <div onClick="{{ back }}" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:20px" style-hover="background:rgba(255,255,255,0.06)">
+              <div style="width:9px;height:9px;border-left:1.6px solid #F2F0EE;border-bottom:1.6px solid #F2F0EE;transform:rotate(45deg)"></div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:17px;font-weight:500">{{ sp.title }}</div>
+              <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#7E7B77">{{ sp.sub }}</div>
+            </div>
+          </div>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:4px 16px 40px">
+            <sc-for list="{{ sp.sections }}" as="s" hint-placeholder-count="3">
+              <div style="padding-bottom:20px">
+                <div style="display:flex;align-items:center;gap:8px;padding-bottom:9px">
+                  <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6E6B67">{{ s.name }}</div>
+                  <div style="flex:1;height:1px;background:rgba(255,255,255,0.07)"></div>
+                </div>
+                <sc-if value="{{ s.hasNote }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12.5px;color:#93908C;line-height:1.5;padding-bottom:11px;text-wrap:pretty">{{ s.note }}</div>
+                </sc-if>
+                <div style="display:flex;flex-direction:column;gap:1px;border-radius:12px;overflow:hidden">
+                  <sc-for list="{{ s.rows }}" as="r" hint-placeholder-count="3">
+                    <div onClick="{{ r.tap }}" style="display:flex;align-items:center;gap:12px;padding:13px;background:#141419;cursor:{{ r.cursor }}" style-hover="background:#1A1A20">
+                      <sc-if value="{{ r.hasDot }}" hint-placeholder-val="{{ false }}">
+                        <div style="width:14px;height:14px;border-radius:4px;flex:0 0 auto;background:{{ r.dot }}"></div>
+                      </sc-if>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:14px;color:{{ r.color }}">{{ r.label }}</div>
+                        <sc-if value="{{ r.hasSub }}" hint-placeholder-val="{{ false }}">
+                          <div style="font-size:12px;color:#7E7B77;margin-top:3px;line-height:1.4">{{ r.sub }}</div>
+                        </sc-if>
+                      </div>
+                      <sc-if value="{{ r.hasValue }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-family:'JetBrains Mono', monospace;font-size:11px;color:#93908C;white-space:nowrap">{{ r.value }}</div>
+                      </sc-if>
+                      <sc-if value="{{ r.hasSwitch }}" hint-placeholder-val="{{ false }}">
+                        <div style="width:36px;height:20px;border-radius:11px;flex:0 0 auto;display:flex;align-items:center;padding:2px;box-sizing:border-box;background:{{ r.switchBg }};justify-content:{{ r.switchJustify }}">
+                          <div style="width:16px;height:16px;border-radius:9px;background:{{ r.knob }}"></div>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ r.hasAction }}" hint-placeholder-val="{{ false }}">
+                        <div onClick="{{ r.action }}" style="padding:6px 10px;border-radius:8px;background:#26262E;font-size:12px;color:#C9C6C2;cursor:pointer" style-hover="background:#32323C">{{ r.actionLabel }}</div>
+                      </sc-if>
+                      <sc-if value="{{ r.hasDanger }}" hint-placeholder-val="{{ false }}">
+                        <div onClick="{{ r.danger }}" style="padding:6px 10px;border-radius:8px;background:rgba(226,69,60,0.16);font-size:12px;color:#FF9B93;cursor:pointer" style-hover="background:rgba(226,69,60,0.3)">{{ r.dangerLabel }}</div>
+                      </sc-if>
+                      <sc-if value="{{ r.chevron }}" hint-placeholder-val="{{ false }}">
+                        <div style="width:7px;height:7px;border-right:1.5px solid #5E5B57;border-top:1.5px solid #5E5B57;transform:rotate(45deg)"></div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ sp.hasEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:70px 30px;text-align:center">
+                <div style="font-size:16px;font-weight:500">{{ sp.emptyTitle }}</div>
+                <div style="font-size:13px;color:#7E7B77;margin-top:6px;line-height:1.5">{{ sp.emptyBody }}</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ atImport }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:6px;padding:10px 14px 8px 6px">
+            <div onClick="{{ back }}" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:20px" style-hover="background:rgba(255,255,255,0.06)">
+              <div style="width:11px;height:11px;position:relative"><div style="position:absolute;top:5px;left:0;width:11px;height:1.6px;background:#F2F0EE;transform:rotate(45deg)"></div><div style="position:absolute;top:5px;left:0;width:11px;height:1.6px;background:#F2F0EE;transform:rotate(-45deg)"></div></div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:17px;font-weight:500">Import preview</div>
+              <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#7E7B77">requests-2026-08-03.json · shared</div>
+            </div>
+          </div>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:4px 16px 30px">
+            <div style="display:flex;gap:8px">
+              <div style="flex:1;padding:14px 12px;border-radius:12px;background:rgba(255,107,26,0.09);border:1px solid rgba(255,107,26,0.25)">
+                <div style="font-family:'JetBrains Mono', monospace;font-size:22px;font-weight:700;color:#FF6B1A">12</div>
+                <div style="font-size:11px;color:#C9C6C2;margin-top:3px">new</div>
+              </div>
+              <div style="flex:1;padding:14px 12px;border-radius:12px;background:#141419;border:1px solid rgba(255,255,255,0.07)">
+                <div style="font-family:'JetBrains Mono', monospace;font-size:22px;font-weight:700">3</div>
+                <div style="font-size:11px;color:#C9C6C2;margin-top:3px">updates</div>
+              </div>
+              <div style="flex:1;padding:14px 12px;border-radius:12px;background:rgba(226,69,60,0.1);border:1px solid rgba(226,69,60,0.28)">
+                <div style="font-family:'JetBrains Mono', monospace;font-size:22px;font-weight:700;color:#FF7A70">2</div>
+                <div style="font-size:11px;color:#C9C6C2;margin-top:3px">rejected</div>
+              </div>
+            </div>
+            <div style="margin-top:18px">
+              <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6E6B67;padding-bottom:9px">Rejected rows</div>
+              <div style="display:flex;flex-direction:column;gap:7px">
+                <sc-for list="{{ imp.rejected }}" as="r" hint-placeholder-count="2">
+                  <div style="padding:11px 12px;border-radius:11px;background:#141419;border-left:2px solid #E2453C">
+                    <div style="display:flex;gap:9px">
+                      <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#5E5B57">{{ r.row }}</div>
+                      <div style="flex:1;font-size:13px;color:#C9C6C2;line-height:1.35">{{ r.title }}</div>
+                    </div>
+                    <div style="font-size:11.5px;color:#FF9B93;margin-top:6px">{{ r.reason }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="font-size:11.5px;color:#7E7B77;margin-top:9px;line-height:1.45">One bad row never kills the batch. The other 15 still commit.</div>
+            </div>
+            <div style="margin-top:20px">
+              <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6E6B67;padding-bottom:9px">Target</div>
+              <div style="display:flex;flex-direction:column;gap:1px;border-radius:12px;overflow:hidden">
+                <div onClick="{{ imp.pickBoard }}" style="display:flex;align-items:center;gap:12px;padding:13px;background:#141419;cursor:pointer" style-hover="background:#1A1A20">
+                  <div style="flex:1;font-size:14px">Board</div>
+                  <div style="font-family:'JetBrains Mono', monospace;font-size:12px;color:#FF6B1A">{{ imp.boardName }}</div>
+                </div>
+                <div onClick="{{ imp.pickStatus }}" style="display:flex;align-items:center;gap:12px;padding:13px;background:#141419;cursor:pointer" style-hover="background:#1A1A20">
+                  <div style="flex:1;font-size:14px">Landing status</div>
+                  <div style="font-family:'JetBrains Mono', monospace;font-size:12px;color:#FF6B1A">{{ imp.statusName }}</div>
+                </div>
+                <div onClick="{{ imp.toggleRemember }}" style="display:flex;align-items:center;gap:12px;padding:13px;background:#141419;cursor:pointer">
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:14px">Remember this mapping</div>
+                    <div style="font-family:'JetBrains Mono', monospace;font-size:11px;color:#7E7B77;margin-top:3px">{{ imp.slugText }}</div>
+                  </div>
+                  <div style="width:36px;height:20px;border-radius:11px;flex:0 0 auto;display:flex;align-items:center;padding:2px;box-sizing:border-box;background:{{ imp.rememberBg }};justify-content:{{ imp.rememberJustify }}">
+                    <div style="width:16px;height:16px;border-radius:9px;background:{{ imp.rememberKnob }}"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:12px 16px 16px;border-top:1px solid rgba(255,255,255,0.07);background:#101014;display:flex;gap:9px">
+            <div onClick="{{ back }}" style="padding:13px 18px;border-radius:11px;background:#1D1D23;font-size:14px;cursor:pointer" style-hover="background:#26262E">Cancel</div>
+            <div onClick="{{ imp.confirm }}" style="flex:1;text-align:center;padding:13px 0;border-radius:11px;background:#FF6B1A;color:#0B0B0C;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#FF8A4C">Import 15 items</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ atOnboarding }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:30;background:#0B0B0C;display:flex;flex-direction:column;padding:40px 26px 26px;box-sizing:border-box">
+          <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.2em;color:#FF6B1A;text-transform:uppercase">Projectmate</div>
+          <div style="font-size:29px;font-weight:500;line-height:1.2;margin-top:14px;text-wrap:pretty">Pick a couple of boards to start with.</div>
+          <div style="font-size:14px;color:#8C8983;margin-top:11px;line-height:1.5;text-wrap:pretty">Each one arrives with its own statuses. You can rename or reorder them later — nothing here is permanent.</div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:26px">
+            <sc-for list="{{ ob.options }}" as="o" hint-placeholder-count="3">
+              <div onClick="{{ o.toggle }}" style="display:flex;align-items:center;gap:13px;padding:15px;border-radius:13px;cursor:pointer;background:#141419;border:1px solid {{ o.border }}">
+                <div style="width:21px;height:21px;border-radius:6px;flex:0 0 auto;border:1.5px solid {{ o.mark }};background:{{ o.markBg }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#0B0B0C">{{ o.tick }}</div>
+                <div style="flex:1">
+                  <div style="font-size:15px;font-weight:500">{{ o.name }}</div>
+                  <div style="font-family:'JetBrains Mono', monospace;font-size:10.5px;color:#7E7B77;margin-top:4px">{{ o.statuses }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="flex:1"></div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div onClick="{{ ob.skip }}" style="padding:13px 16px;font-size:14px;color:#8C8983;cursor:pointer">Skip</div>
+            <div style="flex:1"></div>
+            <div onClick="{{ ob.seed }}" style="padding:14px 26px;border-radius:12px;background:#FF6B1A;color:#0B0B0C;font-size:14.5px;font-weight:500;cursor:pointer" style-hover="background:#FF8A4C">{{ ob.cta }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasSheet }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;justify-content:flex-end">
+          <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(0,0,0,0.6)"></div>
+          <div style="position:relative;background:#16161B;border-top:1px solid rgba(255,255,255,0.1);border-radius:22px 22px 0 0;padding:10px 0 18px;max-height:640px;display:flex;flex-direction:column">
+            <div style="width:34px;height:4px;border-radius:2px;background:#3A3A42;margin:0 auto 12px"></div>
+            <div style="padding:0 20px 12px">
+              <div style="font-size:16px;font-weight:500">{{ sh.title }}</div>
+              <sc-if value="{{ sh.hasSub }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12.5px;color:#8C8983;margin-top:5px;line-height:1.45;text-wrap:pretty">{{ sh.sub }}</div>
+              </sc-if>
+            </div>
+
+            <sc-if value="{{ sh.isQuickAdd }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 20px">
+                <input value="{{ sh.quick }}" onChange="{{ sh.setQuick }}" placeholder="Something to do…" style="width:100%;box-sizing:border-box;background:#0F0F13;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;color:#F2F0EE;font-size:15px;font-family:Roboto, system-ui, sans-serif;outline:none" />
+                <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:12px">
+                  <sc-for list="{{ sh.parsed }}" as="p" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;background:{{ p.bg }}">
+                      <div style="font-family:'JetBrains Mono', monospace;font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;color:#7E7B77">{{ p.kind }}</div>
+                      <div style="font-size:12px;color:{{ p.color }}">{{ p.value }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="font-family:'JetBrains Mono', monospace;font-size:10.5px;color:#5E5B57;margin-top:12px;line-height:1.6">!! urgent · #tag · @board · tomorrow / fri</div>
+                <div onClick="{{ sh.addQuick }}" style="margin-top:14px;text-align:center;padding:13px 0;border-radius:11px;background:#FF6B1A;color:#0B0B0C;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#FF8A4C">Add</div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ sh.isDate }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 20px">
+                <div onClick="{{ sh.toggleAllDay }}" style="display:flex;align-items:center;gap:12px;padding:13px;border-radius:12px;background:#0F0F13;cursor:pointer;margin-bottom:12px">
+                  <div style="flex:1">
+                    <div style="font-size:14px">All-day</div>
+                    <div style="font-size:11.5px;color:#7E7B77;margin-top:3px">Overdue only once the day has ended</div>
+                  </div>
+                  <div style="width:36px;height:20px;border-radius:11px;display:flex;align-items:center;padding:2px;box-sizing:border-box;background:{{ sh.allDayBg }};justify-content:{{ sh.allDayJustify }}">
+                    <div style="width:16px;height:16px;border-radius:9px;background:{{ sh.allDayKnob }}"></div>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+                  <sc-for list="{{ sh.dates }}" as="d" hint-placeholder-count="6">
+                    <div onClick="{{ d.set }}" style="padding:12px;border-radius:10px;cursor:pointer;background:{{ d.bg }};border:1px solid {{ d.border }}">
+                      <div style="font-size:13.5px;color:{{ d.color }}">{{ d.name }}</div>
+                      <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#6E6B67;margin-top:3px">{{ d.sub }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ sh.hasList }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1;min-height:0;overflow-y:auto;padding:0 20px">
+                <sc-for list="{{ sh.groups }}" as="g" hint-placeholder-count="2">
+                  <div style="padding-bottom:14px">
+                    <sc-if value="{{ g.hasName }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6E6B67;padding:6px 0 8px">{{ g.name }}</div>
+                    </sc-if>
+                    <div style="display:flex;flex-direction:column;gap:1px;border-radius:11px;overflow:hidden">
+                      <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+                        <div onClick="{{ r.tap }}" style="display:flex;align-items:center;gap:12px;padding:13px;background:#0F0F13;cursor:pointer" style-hover="background:#1A1A20">
+                          <sc-if value="{{ r.hasDot }}" hint-placeholder-val="{{ false }}">
+                            <div style="width:12px;height:12px;border-radius:4px;flex:0 0 auto;background:{{ r.dot }}"></div>
+                          </sc-if>
+                          <div style="flex:1;min-width:0">
+                            <div style="font-size:14px;color:{{ r.color }}">{{ r.label }}</div>
+                            <sc-if value="{{ r.hasSub }}" hint-placeholder-val="{{ false }}">
+                              <div style="font-family:'JetBrains Mono', monospace;font-size:10.5px;color:#7E7B77;margin-top:4px;line-height:1.5">{{ r.sub }}</div>
+                            </sc-if>
+                          </div>
+                          <sc-if value="{{ r.checked }}" hint-placeholder-val="{{ false }}">
+                            <div style="font-size:13px;color:#FF6B1A">✓</div>
+                          </sc-if>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ sh.hasCreate }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:8px;padding-bottom:8px">
+                    <input value="{{ sh.newTag }}" onChange="{{ sh.setNewTag }}" placeholder="Create a tag" style="flex:1;background:#0F0F13;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 12px;color:#F2F0EE;font-size:13.5px;font-family:Roboto, system-ui, sans-serif;outline:none" />
+                    <div onClick="{{ sh.createTag }}" style="padding:11px 15px;border-radius:10px;background:rgba(255,107,26,0.16);color:#FF6B1A;font-size:13px;font-weight:500;cursor:pointer">Add</div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ sh.isColor }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:0 20px">
+                <div style="display:flex;flex-wrap:wrap;gap:11px">
+                  <sc-for list="{{ sh.swatches }}" as="s" hint-placeholder-count="8">
+                    <div onClick="{{ s.set }}" style="width:44px;height:44px;border-radius:12px;cursor:pointer;background:{{ s.color }};border:2px solid {{ s.ring }}"></div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ sh.isConfirm }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:4px 20px 0;display:flex;gap:9px">
+                <div onClick="{{ closeSheet }}" style="flex:1;text-align:center;padding:13px 0;border-radius:11px;background:#1D1D23;font-size:14px;cursor:pointer" style-hover="background:#26262E">Keep it</div>
+                <div onClick="{{ sh.confirm }}" style="flex:1;text-align:center;padding:13px 0;border-radius:11px;background:#E2453C;color:#0B0B0C;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#F0564D">{{ sh.confirmLabel }}</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:stretch;padding:6px 4px 10px;background:#101014;border-top:1px solid rgba(255,255,255,0.07)">
+          <div onClick="{{ goBoards }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:7px 0;cursor:pointer">
+            <div style="display:flex;align-items:center;justify-content:center;width:56px;height:28px;border-radius:14px;background:{{ tabs.boards.pill }}">
+              <div style="display:grid;grid-template-columns:6px 6px;gap:3px">
+                <div style="width:6px;height:6px;border-radius:1.5px;background:{{ tabs.boards.color }}"></div>
+                <div style="width:6px;height:6px;border-radius:1.5px;background:{{ tabs.boards.color }}"></div>
+                <div style="width:6px;height:6px;border-radius:1.5px;background:{{ tabs.boards.color }}"></div>
+                <div style="width:6px;height:6px;border-radius:1.5px;background:{{ tabs.boards.color }}"></div>
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:500;color:{{ tabs.boards.color }}">Boards</div>
+          </div>
+          <div onClick="{{ goToday }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:7px 0;cursor:pointer">
+            <div style="display:flex;align-items:center;justify-content:center;width:56px;height:28px;border-radius:14px;background:{{ tabs.today.pill }}">
+              <div style="width:15px;height:15px;border-radius:8px;border:1.5px solid {{ tabs.today.color }};display:flex;align-items:center;justify-content:center">
+                <div style="width:4px;height:4px;border-radius:3px;background:{{ tabs.today.color }}"></div>
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:500;color:{{ tabs.today.color }}">Today</div>
+          </div>
+          <div onClick="{{ goInbox }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:7px 0;cursor:pointer;position:relative">
+            <div style="display:flex;align-items:center;justify-content:center;width:56px;height:28px;border-radius:14px;background:{{ tabs.inbox.pill }}">
+              <div style="width:16px;height:13px;border-radius:3px;border:1.5px solid {{ tabs.inbox.color }};display:flex;align-items:flex-end;padding-bottom:2px;justify-content:center">
+                <div style="width:8px;height:1.5px;background:{{ tabs.inbox.color }}"></div>
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:500;color:{{ tabs.inbox.color }}">Inbox</div>
+            <sc-if value="{{ hasInbox }}" hint-placeholder-val="{{ true }}">
+              <div style="position:absolute;top:6px;right:26px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:#FF6B1A;color:#0B0B0C;font-family:'JetBrains Mono', monospace;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ inboxCount }}</div>
+            </sc-if>
+          </div>
+          <div onClick="{{ goSearch }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:7px 0;cursor:pointer">
+            <div style="display:flex;align-items:center;justify-content:center;width:56px;height:28px;border-radius:14px;background:{{ tabs.search.pill }}">
+              <div style="position:relative;width:16px;height:16px">
+                <div style="position:absolute;top:0;left:0;width:11px;height:11px;border-radius:7px;border:1.5px solid {{ tabs.search.color }}"></div>
+                <div style="position:absolute;bottom:1px;right:1px;width:6px;height:1.5px;border-radius:1px;transform:rotate(45deg);background:{{ tabs.search.color }}"></div>
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:500;color:{{ tabs.search.color }}">Search</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:16px;right:16px;bottom:100px;padding:13px 15px;border-radius:11px;background:#26262E;border:1px solid rgba(255,255,255,0.1);font-size:13px;color:#F2F0EE;box-shadow:0 10px 30px rgba(0,0,0,0.5)">{{ toast }}</div>
+      </sc-if>
+
+    </div>
+  </x-import>
+
+  <sc-if value="{{ showIndex }}" hint-placeholder-val="{{ true }}">
+    <div style="width:236px;flex:0 0 auto;padding-top:8px">
+      <div style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#FF6B1A;padding-bottom:12px">Screen index</div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <sc-for list="{{ indexRows }}" as="i" hint-placeholder-count="16">
+          <div onClick="{{ i.go }}" style="display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:7px;cursor:pointer;background:{{ i.bg }}" style-hover="background:rgba(255,255,255,0.05)">
+            <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#5E5B57;width:16px">{{ i.n }}</div>
+            <div style="flex:1;font-size:12.5px;color:{{ i.color }}">{{ i.name }}</div>
+            <div style="font-size:10px;color:#5E5B57">{{ i.kind }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:760,&quot;height&quot;:990},&quot;showScreenIndex&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;wipWarnings&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Boards&quot;,&quot;options&quot;:[&quot;Boards&quot;,&quot;Today&quot;,&quot;Inbox&quot;,&quot;Search&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = this.seed();
+
+  seed() {
+    const mk = (id, name, color, cat, x) => Object.assign({ id, name, color, cat, wip: null, focus: false, def: false }, x || {});
+    const proj = () => [
+      mk('bk', 'Backlog', '#5C5C64', 'backlog', { def: true }),
+      mk('nx', 'Next up', '#84818C', 'backlog'),
+      mk('ip', 'In progress', '#FF6B1A', 'active', { wip: 3, focus: true }),
+      mk('bl', 'Blocked', '#E2453C', 'blocked'),
+      mk('rv', 'In review', '#FFA05C', 'active', { wip: 2 }),
+      mk('dn', 'Done', '#6F6C68', 'done')
+    ];
+    const life = () => [
+      mk('td', 'To do', '#5C5C64', 'backlog', { def: true }),
+      mk('dg', 'Doing', '#FF6B1A', 'active', { focus: true, wip: 2 }),
+      mk('wt', 'Waiting on', '#E2453C', 'blocked'),
+      mk('dn', 'Done', '#6F6C68', 'done')
+    ];
+    const boards = [
+      { id: 'portal', code: 'PV', name: 'Portal v2', accent: '#4A8FE7', type: 'Projects', pinned: true, view: 'kanban', groupBy: 'status', slug: 'portal-v2', statuses: proj() },
+      { id: 'mobile', code: 'MA', name: 'Mobile app', accent: '#2E9E8F', type: 'Projects', pinned: true, view: 'kanban', groupBy: 'status', slug: '', statuses: proj() },
+      { id: 'freq', code: 'FR', name: 'Feature requests', accent: '#D9628E', type: 'Projects', pinned: false, view: 'list', groupBy: 'priority', slug: 'requests', statuses: proj() },
+      { id: 'house', code: 'HS', name: 'House', accent: '#8B7BE8', type: 'Life', pinned: false, view: 'agenda', groupBy: 'due', slug: '', statuses: life() },
+      { id: 'bikes', code: 'BK', name: 'Bikes', accent: '#C9A227', type: 'Life', pinned: false, view: 'list', groupBy: 'status', slug: '', statuses: life() },
+      { id: 'read', code: 'RD', name: 'Reading', accent: '#6E8B74', type: 'Other', pinned: false, view: 'list', groupBy: 'tag', slug: '', statuses: life() }
+    ];
+    const it = (id, board, status, title, x) => Object.assign({
+      id, board, status, title, priority: 'normal', due: null, allDay: false, time: '17:00',
+      tags: [], checklist: [], notes: '', source: null, links: []
+    }, x || {});
+    const items = [
+      it('i1', 'portal', 'ip', 'Slug → board mapping table', { priority: 'urgent', due: '2026-08-03', tags: ['api'], notes: 'One row per portal slug. RESTRICT on delete so a live mapping can\u2019t vanish under an in-flight import.', checklist: [['Schema', 1], ['Migration', 1], ['Settings UI', 1], ['Conflict copy', 0], ['Tests', 0]] }),
+      it('i2', 'portal', 'bl', 'Reject rows with no title, keep the batch', { priority: 'urgent', due: '2026-07-30', tags: ['api'], notes: 'Blocked on the reason strings — needs wording that survives translation.', checklist: [['Reason enum', 1], ['Copy review', 0]], links: [['Blocks', 'Parse summary copy review']] }),
+      it('i3', 'portal', 'nx', 'Parse summary copy review', { tags: [] }),
+      it('i4', 'portal', 'bk', 'Worker pull scheduling', { priority: 'low' }),
+      it('i5', 'portal', 'rv', 'Portal auth token screen', { due: '2026-08-07', tags: ['api'] }),
+      it('i6', 'portal', 'dn', 'projectmate:// deep link handler', {}),
+      it('i7', 'mobile', 'ip', 'Segmented progress bar component', { priority: 'urgent', due: '2026-08-04', tags: ['ui'], checklist: [['Four categories', 1], ['Blocked emphasis', 1], ['Empty board', 0], ['Contrast check', 0]], notes: 'Four colours, never a percentage. Blocked has to read at a glance.' }),
+      it('i8', 'mobile', 'ip', 'Status editor: category dropdown copy', { tags: ['ui'] }),
+      it('i9', 'mobile', 'rv', 'Kanban column WIP tint', { due: '2026-08-05', tags: ['ui'] }),
+      it('i10', 'mobile', 'bk', 'Item detail autosave', { priority: 'low' }),
+      it('i11', 'mobile', 'nx', 'Agenda view buckets', {}),
+      it('i12', 'mobile', 'bk', 'Tablet navigation rail', { priority: 'low' }),
+      it('i13', 'freq', 'bk', 'Recurring tasks', { source: 'portal', fr: { requester: 'm.okafor', votes: 48, date: '12 Jul 2026' }, notes: 'Weekly bin day, monthly rent — currently re-created by hand every time.' }),
+      it('i14', 'freq', 'nx', 'Export a board to CSV', { source: 'portal', fr: { requester: 'j.lind', votes: 31, date: '19 Jul 2026' } }),
+      it('i15', 'freq', 'ip', 'Home screen widget for Today', { source: 'portal', due: '2026-08-06', fr: { requester: 'a.patel', votes: 27, date: '24 Jul 2026' } }),
+      it('i16', 'house', 'dg', 'Book the boiler service', { due: '2026-08-06', allDay: true, tags: ['home'] }),
+      it('i17', 'house', 'td', 'Replace the bathroom bulb', { priority: 'low', tags: ['home'] }),
+      it('i18', 'house', 'wt', 'Chase the deposit refund', { priority: 'urgent', due: '2026-07-29', allDay: true, tags: ['money'] }),
+      it('i19', 'bikes', 'dg', 'True the rear wheel', { tags: ['errand'] }),
+      it('i20', 'bikes', 'td', 'Order brake pads', { due: '2026-08-10', tags: ['errand', 'money'] }),
+      it('i21', 'read', 'dg', 'Finish chapter 7 notes', {})
+    ];
+    const inbox = [
+      { id: 'n1', title: 'Dark mode that follows the system', source: 'portal', body: 'Switching manually every evening is the only thing I do in settings.', requester: 'r.mensah', votes: 22 },
+      { id: 'n2', title: 'Attach a photo to an item', source: 'portal', body: 'For house jobs — a picture of the part beats a description.', requester: 'k.ruiz', votes: 14 },
+      { id: 'n3', title: 'Pick up dry cleaning', source: 'shared', body: 'Shared from Messages, 08:12', requester: '', votes: 0 },
+      { id: 'n4', title: 'Q3 handover checklist', source: 'imported', body: 'From handover.md — 9 rows, 1 rejected', requester: '', votes: 0 },
+      { id: 'n5', title: 'Keyboard shortcuts on tablet', source: 'portal', body: 'Filed twice this month by different people.', requester: 'd.sorensen', votes: 9 }
+    ];
+    return {
+      boards, items, inbox,
+      tags: [
+        { id: 'api', name: 'api', color: '#4A8FE7', },
+        { id: 'ui', name: 'ui', color: '#8B7BE8' },
+        { id: 'money', name: 'money', color: '#C9A227' },
+        { id: 'home', name: 'home', color: '#2E9E8F' },
+        { id: 'errand', name: 'errand', color: '#D9628E' }
+      ],
+      views: [{ id: 'v1', name: 'Overdue', rule: 'due before today · non-terminal' }],
+      archived: {
+        boards: [{ id: 'a1', code: 'PT', name: 'Portal v1', accent: '#5C5C64', meta: 'archived 2 Jun · 41 items' }],
+        items: [{ id: 'a2', title: 'Old import spike', meta: 'Portal v2 · archived 11 Jul' }, { id: 'a3', title: 'Fix the shed door', meta: 'House · archived 3 Jul' }]
+      },
+      tab: 'boards',
+      stacks: { boards: [], today: [], inbox: [], search: [] },
+      sheet: null,
+      toast: null,
+      query: '',
+      filters: [],
+      bulkMode: false,
+      selected: [],
+      onboarding: false,
+      settings: { theme: 'dark', dynamic: false, start: 'Boards' },
+      importTarget: { board: 'freq', status: 'bk', remember: true },
+      quick: ''
+    };
+  }
+
+  // ---------- helpers
+  T = '2026-08-03';
+  board(id) { return this.state.boards.find(b => b.id === id); }
+  status(b, sid) { return b.statuses.find(s => s.id === sid) || b.statuses[0]; }
+  tag(id) { return this.state.tags.find(t => t.id === id); }
+  item(id) { return this.state.items.find(i => i.id === id); }
+  stack() { return this.state.stacks[this.state.tab]; }
+  top() { const s = this.stack(); return s.length ? s[s.length - 1] : { screen: this.state.tab }; }
+  push(scr) { this.setState(st => ({ stacks: Object.assign({}, st.stacks, { [st.tab]: st.stacks[st.tab].concat([scr]) }), sheet: null })); }
+  pop() { this.setState(st => ({ stacks: Object.assign({}, st.stacks, { [st.tab]: st.stacks[st.tab].slice(0, -1) }), sheet: null })); }
+  replaceTop(patch) { this.setState(st => { const s = st.stacks[st.tab].slice(); s[s.length - 1] = Object.assign({}, s[s.length - 1], patch); return { stacks: Object.assign({}, st.stacks, { [st.tab]: s }), sheet: null }; }); }
+  say(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2600); }
+  patchItem(id, patch) { this.setState(st => ({ items: st.items.map(i => i.id === id ? Object.assign({}, i, patch) : i) })); }
+  mono(v) { return v; }
+  fmt(d) { const p = d.split('-'); const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+p[1] - 1]; return M + ' ' + (+p[2]); }
+  dayName(d) { return ({ '2026-08-03': 'Today', '2026-08-04': 'Tomorrow', '2026-08-05': 'Wed', '2026-08-06': 'Thu', '2026-08-07': 'Fri', '2026-08-08': 'Sat' })[d]; }
+  due(i) {
+    if (!i.due) return { hasDue: false, dueText: '', dueColor: '#93908C', dueBg: 'rgba(255,255,255,0.06)' };
+    const suffix = i.allDay ? '' : ' ' + i.time;
+    if (i.due < this.T) return { hasDue: true, dueText: 'Overdue · ' + this.fmt(i.due), dueColor: '#FF7A70', dueBg: 'rgba(226,69,60,0.16)' };
+    if (i.due === this.T) return { hasDue: true, dueText: 'Today' + suffix, dueColor: '#FF6B1A', dueBg: 'rgba(255,107,26,0.14)' };
+    const n = this.dayName(i.due);
+    return { hasDue: true, dueText: (n || this.fmt(i.due)) + suffix, dueColor: '#C9C6C2', dueBg: 'rgba(255,255,255,0.06)' };
+  }
+  tint(hex, a) { const n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
+  itemVM(i) {
+    const b = this.board(i.board), s = this.status(b, i.status), d = this.due(i);
+    const done = i.checklist.filter(c => c[1]).length;
+    return Object.assign({
+      id: i.id, title: i.title, code: b.code, accent: b.accent, accentBg: this.tint(b.accent, 0.16),
+      boardName: b.name, statusName: s.name, statusColor: s.color, statusBg: this.tint(s.color, 0.14),
+      urgent: i.priority === 'urgent', prioLabel: i.priority,
+      hasCheck: i.checklist.length > 0, checkText: done + '/' + i.checklist.length,
+      tagDots: i.tags.map(t => ({ id: t, color: (this.tag(t) || {}).color || '#5C5C64' })),
+      isFR: !!i.fr, votes: i.fr ? i.fr.votes + ' votes' : '',
+      open: () => this.push({ screen: 'item', id: i.id })
+    }, d);
+  }
+
+  renderVals() {
+    const st = this.state, top = this.top(), scr = top.screen;
+    const showIndex = this.props.showScreenIndex !== false;
+    const at = k => scr === k;
+    const tabVM = k => ({ color: st.tab === k && this.stack().length === 0 ? '#FF6B1A' : (st.tab === k ? '#FF6B1A' : '#8C8983'), pill: st.tab === k ? 'rgba(255,107,26,0.14)' : 'transparent' });
+
+    const cats = [['backlog', '#3A3A42', 'Backlog'], ['active', '#FF6B1A', 'Active'], ['blocked', '#E2453C', 'Blocked'], ['done', '#6F6C68', 'Done']];
+    const boardVM = b => {
+      const its = st.items.filter(i => i.board === b.id);
+      const byCat = c => its.filter(i => this.status(b, i.status).cat === c).length;
+      const total = its.length || 1;
+      const openCount = its.filter(i => this.status(b, i.status).cat !== 'done').length;
+      const nexts = its.filter(i => i.due && this.status(b, i.status).cat !== 'done').map(i => i.due).sort();
+      return {
+        id: b.id, code: b.code, name: b.name, accent: b.accent, accentBg: this.tint(b.accent, 0.16), pinned: b.pinned,
+        meta: openCount + ' open' + (nexts.length ? '  ·  next ' + (nexts[0] < this.T ? 'overdue' : this.fmt(nexts[0])) : '  ·  no dates'),
+        segs: cats.map(c => ({ w: (byCat(c[0]) / total * 100).toFixed(1) + '%', color: c[1] })),
+        legend: cats.map(c => ({ color: c[1], label: byCat(c[0]) + ' ' + c[2].toLowerCase(), text: c[0] === 'blocked' && byCat('blocked') ? '#FF7A70' : '#7E7B77' })),
+        open: () => this.push({ screen: 'board', id: b.id, view: b.view })
+      };
+    };
+    const groupNames = ['Projects', 'Life', 'Other'];
+    const boardGroups = [{ name: 'Pinned', boards: st.boards.filter(b => b.pinned).map(boardVM) }]
+      .concat(groupNames.map(g => ({ name: g, boards: st.boards.filter(b => b.type === g && !b.pinned).map(boardVM) })))
+      .filter(g => g.boards.length);
+
+    const nonTerminal = i => this.status(this.board(i.board), i.status).cat !== 'done';
+    const overdue = st.items.filter(i => i.due && i.due < this.T && nonTerminal(i));
+    const dueToday = st.items.filter(i => i.due === this.T && nonTerminal(i));
+    const inFocus = st.items.filter(i => this.status(this.board(i.board), i.status).focus && !i.due);
+    const todaySections = [
+      { title: 'Overdue', color: '#FF7A70', rows: overdue },
+      { title: 'Due today', color: '#FF6B1A', rows: dueToday },
+      { title: 'In focus', color: '#C9C6C2', rows: inFocus }
+    ].filter(s => s.rows.length).map(s => ({ title: s.title, color: s.color, count: s.rows.length, rows: s.rows.map(i => this.itemVM(i)) }));
+
+    const srcName = { portal: 'from the portal', shared: 'shared', imported: 'imported' };
+    const inboxGroups = ['shared', 'imported', 'portal'].map(k => ({
+      name: srcName[k], rows: st.inbox.filter(n => n.source === k).map(n => ({
+        id: n.id, title: n.title, body: n.body,
+        sourceBadge: k === 'portal' ? 'portal' : k,
+        meta: n.votes ? n.requester + '  ·  ' + n.votes + ' votes' : '',
+        border: st.selected.indexOf(n.id) >= 0 ? 'rgba(255,107,26,0.5)' : 'rgba(255,255,255,0.06)',
+        selBorder: st.selected.indexOf(n.id) >= 0 ? '#FF6B1A' : '#5C5C64',
+        selBg: st.selected.indexOf(n.id) >= 0 ? '#FF6B1A' : 'transparent',
+        selMark: st.selected.indexOf(n.id) >= 0 ? '✓' : '',
+        toggleSel: () => this.setState(s => ({ selected: s.selected.indexOf(n.id) >= 0 ? s.selected.filter(x => x !== n.id) : s.selected.concat([n.id]) })),
+        move: () => this.setState({ sheet: { kind: 'boardPicker', inboxId: n.id } }),
+        tag: () => this.setState({ sheet: { kind: 'tagPicker', inboxId: n.id } }),
+        dismiss: () => { this.setState(s => ({ inbox: s.inbox.filter(x => x.id !== n.id) })); this.say('Dismissed “' + n.title + '”'); }
+      }))
+    })).filter(g => g.rows.length);
+
+    const fkinds = [['status:active', 'Active'], ['status:blocked', 'Blocked'], ['prio:urgent', 'Urgent'], ['due:week', 'Due this week'], ['tag:api', '#api'], ['tag:ui', '#ui'], ['board:house', 'House']];
+    const on = k => st.filters.indexOf(k) >= 0;
+    const q = st.query.trim().toLowerCase();
+    let results = st.items.filter(i => !q || i.title.toLowerCase().indexOf(q) >= 0 || i.notes.toLowerCase().indexOf(q) >= 0);
+    st.filters.forEach(f => {
+      const v = f.split(':')[1];
+      if (f.indexOf('status:') === 0) results = results.filter(i => this.status(this.board(i.board), i.status).cat === v);
+      if (f.indexOf('prio:') === 0) results = results.filter(i => i.priority === v);
+      if (f.indexOf('tag:') === 0) results = results.filter(i => i.tags.indexOf(v) >= 0);
+      if (f.indexOf('board:') === 0) results = results.filter(i => i.board === v);
+      if (f === 'due:week') results = results.filter(i => i.due && i.due <= '2026-08-09');
+    });
+    const searchGroups = st.boards.map(b => ({
+      name: b.name, accent: b.accent, count: results.filter(i => i.board === b.id).length,
+      rows: results.filter(i => i.board === b.id).map(i => this.itemVM(i))
+    })).filter(g => g.rows.length);
+
+    const indexDefs = [
+      ['01', 'Boards home', 'screen', () => this.setState({ tab: 'boards', stacks: Object.assign({}, st.stacks, { boards: [] }), sheet: null, onboarding: false })],
+      ['02', 'Today', 'screen', () => this.setState({ tab: 'today', stacks: Object.assign({}, st.stacks, { today: [] }), sheet: null, onboarding: false })],
+      ['03', 'Inbox', 'screen', () => this.setState({ tab: 'inbox', stacks: Object.assign({}, st.stacks, { inbox: [] }), sheet: null, onboarding: false })],
+      ['04', 'Search', 'screen', () => this.setState({ tab: 'search', stacks: Object.assign({}, st.stacks, { search: [] }), sheet: null, onboarding: false })],
+      ['05', 'Board · kanban', 'screen', () => this.jump({ screen: 'board', id: 'portal', view: 'kanban' })],
+      ['06', 'Board · list', 'screen', () => this.jump({ screen: 'board', id: 'bikes', view: 'list' })],
+      ['07', 'Board · agenda', 'screen', () => this.jump({ screen: 'board', id: 'house', view: 'agenda' })],
+      ['08', 'Item detail', 'screen', () => this.jump({ screen: 'item', id: 'i1' })],
+      ['09', 'Status editor', 'screen', () => this.jump({ screen: 'statusEditor', id: 'portal' })],
+      ['10', 'Board settings', 'screen', () => this.jump({ screen: 'boardSettings', id: 'portal' })],
+      ['11', 'Tag manager', 'screen', () => this.jump({ screen: 'tagManager' })],
+      ['12', 'Saved view', 'screen', () => this.jump({ screen: 'savedView', id: 'v1' })],
+      ['13', 'Archive', 'screen', () => this.jump({ screen: 'archive' })],
+      ['14', 'Settings', 'screen', () => this.jump({ screen: 'settings' })],
+      ['15', 'Onboarding', 'screen', () => this.setState({ onboarding: true, sheet: null })],
+      ['16', 'Import preview', 'screen', () => this.jump({ screen: 'import' })],
+      ['—', 'Quick add', 'sheet', () => this.setState({ sheet: { kind: 'quickAdd' }, quick: '' })],
+      ['—', 'New board', 'sheet', () => this.setState({ sheet: { kind: 'newBoard' } })],
+      ['—', 'Status picker', 'sheet', () => this.setState({ sheet: { kind: 'statusPicker', itemId: 'i1' } })],
+      ['—', 'Date picker', 'sheet', () => this.setState({ sheet: { kind: 'datePicker', itemId: 'i1' } })],
+      ['—', 'Tag picker', 'sheet', () => this.setState({ sheet: { kind: 'tagPicker', itemId: 'i1' } })],
+      ['—', 'Board picker', 'sheet', () => this.setState({ sheet: { kind: 'boardPicker', itemId: 'i1' } })],
+      ['—', 'Colour picker', 'sheet', () => this.setState({ sheet: { kind: 'colorPicker', boardId: 'portal' } })],
+      ['—', 'Confirm delete', 'sheet', () => this.setState({ sheet: { kind: 'confirmDelete', label: 'Portal v1' } })]
+    ];
+    const activeIdx = st.onboarding ? 'Onboarding' : (scr === 'board' ? 'Board · ' + top.view : ({ boards: 'Boards home', today: 'Today', inbox: 'Inbox', search: 'Search', item: 'Item detail', statusEditor: 'Status editor', boardSettings: 'Board settings', tagManager: 'Tag manager', savedView: 'Saved view', archive: 'Archive', settings: 'Settings', import: 'Import preview', about: 'Settings' })[scr]);
+    const indexRows = indexDefs.map(d => ({
+      n: d[0], name: d[1], kind: d[2], go: d[3],
+      bg: (st.sheet && st.sheet.kind && d[2] === 'sheet' && d[1].toLowerCase().replace(/ /g, '') === ({ quickAdd: 'quickadd', newBoard: 'newboard', statusPicker: 'statuspicker', datePicker: 'datepicker', tagPicker: 'tagpicker', boardPicker: 'boardpicker', colorPicker: 'colourpicker', confirmDelete: 'confirmdelete' })[st.sheet.kind]) || (!st.sheet && d[1] === activeIdx) ? 'rgba(255,107,26,0.12)' : 'transparent',
+      color: d[1] === activeIdx ? '#F2F0EE' : '#9A9793'
+    }));
+
+    const back = () => this.pop();
+    const R = (label, o) => Object.assign({
+      label, color: '#F2F0EE', cursor: 'default', hasDot: false, dot: '#5C5C64', hasSub: false, sub: '',
+      hasValue: false, value: '', hasSwitch: false, hasAction: false, hasDanger: false, chevron: false, tap: () => { }
+    }, o || {});
+    const sw = on => ({ hasSwitch: true, switchBg: on ? '#FF6B1A' : '#2A2A32', switchJustify: on ? 'flex-end' : 'flex-start', knob: on ? '#0B0B0C' : '#6E6B67' });
+
+    // ---------- board screen
+    let bd = null;
+    if (scr === 'board') {
+      const b = this.board(top.id), its = st.items.filter(i => i.board === b.id);
+      const mode = top.view || b.view, wipOn = this.props.wipWarnings !== false;
+      const cols = b.statuses.map((s, si) => {
+        const nxt = b.statuses[si + 1];
+        const cards = its.filter(i => i.status === s.id).map(i => {
+          const vm = this.itemVM(i);
+          vm.canAdvance = !!nxt; vm.advanceTip = nxt ? 'Advance to ' + nxt.name : '';
+          vm.advance = e => { if (e && e.stopPropagation) e.stopPropagation(); this.patchItem(i.id, { status: nxt.id }); this.say('“' + i.title + '” → ' + nxt.name); };
+          return vm;
+        });
+        const over = wipOn && s.wip && cards.length > s.wip;
+        return {
+          name: s.name, color: s.color, cards, over: !!over,
+          countText: s.wip ? cards.length + '/' + s.wip : String(cards.length),
+          countColor: over ? '#FF9B93' : '#7E7B77',
+          colBg: over ? 'rgba(226,69,60,0.06)' : '#101014',
+          colBorder: over ? 'rgba(226,69,60,0.32)' : 'rgba(255,255,255,0.06)',
+          add: () => this.setState({ sheet: { kind: 'quickAdd', boardId: b.id, statusId: s.id }, quick: '' })
+        };
+      });
+      const rowVM = i => {
+        const vm = this.itemVM(i);
+        vm.complete = e => { if (e && e.stopPropagation) e.stopPropagation(); const dn = b.statuses.filter(s => s.cat === 'done')[0]; this.patchItem(i.id, { status: dn.id }); this.say('Completed “' + i.title + '”'); };
+        vm.archive = e => { if (e && e.stopPropagation) e.stopPropagation(); this.setState(s2 => ({ items: s2.items.filter(x => x.id !== i.id), archived: { boards: s2.archived.boards, items: s2.archived.items.concat([{ id: i.id, title: i.title, meta: b.name + ' · archived today' }]) } })); this.say('Archived “' + i.title + '”'); };
+        return vm;
+      };
+      const gb = b.groupBy;
+      let groups;
+      if (gb === 'status') groups = b.statuses.map(s => ({ name: s.name, rows: its.filter(i => i.status === s.id).map(rowVM) }));
+      else if (gb === 'priority') groups = ['urgent', 'normal', 'low'].map(p => ({ name: p, rows: its.filter(i => i.priority === p).map(rowVM) }));
+      else if (gb === 'tag') groups = st.tags.map(t => ({ name: '#' + t.name, rows: its.filter(i => i.tags.indexOf(t.id) >= 0).map(rowVM) })).concat([{ name: 'untagged', rows: its.filter(i => !i.tags.length).map(rowVM) }]);
+      else groups = [{ name: 'dated', rows: its.filter(i => i.due).map(rowVM) }, { name: 'no date', rows: its.filter(i => !i.due).map(rowVM) }];
+      groups = groups.filter(g => g.rows.length).map(g => ({ name: g.name, count: g.rows.length, rows: g.rows }));
+      const bucket = (name, color, f) => { const rows = its.filter(f).map(rowVM); return { name, color, rows, count: rows.length, empty: rows.length === 0 }; };
+      const buckets = [
+        bucket('Overdue', '#FF7A70', i => i.due && i.due < this.T),
+        bucket('Today', '#FF6B1A', i => i.due === this.T),
+        bucket('Tomorrow', '#C9C6C2', i => i.due === '2026-08-04'),
+        bucket('This week', '#C9C6C2', i => i.due > '2026-08-04' && i.due <= '2026-08-09'),
+        bucket('Later', '#8C8983', i => i.due > '2026-08-09'),
+        bucket('No date', '#6E6B67', i => !i.due)
+      ];
+      bd = {
+        name: b.name, meta: b.statuses.length + ' statuses  ·  ' + its.length + ' items', cols, groups, buckets,
+        isKanban: mode === 'kanban', isList: mode === 'list', isAgenda: mode === 'agenda',
+        modes: [['kanban', 'Kanban'], ['list', 'List'], ['agenda', 'Agenda']].map(m => ({
+          name: m[1], set: () => this.replaceTop({ view: m[0] }),
+          bg: mode === m[0] ? 'rgba(255,107,26,0.16)' : 'transparent', color: mode === m[0] ? '#FF6B1A' : '#8C8983'
+        })),
+        groupLabel: 'group: ' + gb,
+        groupBy: () => { const order = ['status', 'due', 'priority', 'tag']; const nx = order[(order.indexOf(gb) + 1) % 4]; this.setState(s2 => ({ boards: s2.boards.map(x => x.id === b.id ? Object.assign({}, x, { groupBy: nx }) : x) })); },
+        overflow: () => this.setState({ sheet: { kind: 'boardOverflow', boardId: b.id } })
+      };
+    }
+
+    // ---------- item detail
+    let dt = null;
+    if (scr === 'item') {
+      const i = this.item(top.id), b = this.board(i.board), s = this.status(b, i.status), d = this.due(i);
+      const done = i.checklist.filter(c => c[1]).length;
+      dt = {
+        title: i.title, setTitle: e => this.patchItem(i.id, { title: e.target.value }),
+        notes: i.notes, setNotes: e => this.patchItem(i.id, { notes: e.target.value }),
+        code: b.code, accent: b.accent, accentBg: this.tint(b.accent, 0.16), boardName: b.name,
+        statusName: s.name, statusColor: s.color, statusBg: this.tint(s.color, 0.14),
+        pickStatus: () => this.setState({ sheet: { kind: 'statusPicker', itemId: i.id } }),
+        pickDate: () => this.setState({ sheet: { kind: 'datePicker', itemId: i.id } }),
+        pickTags: () => this.setState({ sheet: { kind: 'tagPicker', itemId: i.id } }),
+        dueChip: i.due ? d.dueText + (i.allDay ? '  ·  all-day' : '') : 'no due date',
+        dueColor: i.due ? d.dueColor : '#8C8983', dueBg: i.due ? d.dueBg : '#1D1D23',
+        prios: [['none', 'None'], ['low', 'Low'], ['normal', 'Normal'], ['urgent', 'Urgent']].map(p => ({
+          name: p[1], set: () => this.patchItem(i.id, { priority: p[0] }),
+          border: i.priority === p[0] ? '#FF6B1A' : 'rgba(255,255,255,0.1)',
+          bg: i.priority === p[0] ? 'rgba(255,107,26,0.14)' : 'transparent',
+          color: i.priority === p[0] ? '#FF6B1A' : '#8C8983'
+        })),
+        tags: i.tags.map(t => this.tag(t)).filter(Boolean), noTags: i.tags.length === 0,
+        checkText: i.checklist.length ? done + ' of ' + i.checklist.length : 'empty',
+        checkPct: i.checklist.length ? (done / i.checklist.length * 100) + '%' : '0%',
+        checklist: i.checklist.map((c, ci) => ({
+          label: c[0], mark: c[1] ? '✓' : '', border: c[1] ? '#FF6B1A' : '#4A4A52', bg: c[1] ? '#FF6B1A' : 'transparent',
+          color: c[1] ? '#7E7B77' : '#F2F0EE', strike: c[1] ? 'line-through' : 'none',
+          toggle: () => this.patchItem(i.id, { checklist: i.checklist.map((x, xi) => xi === ci ? [x[0], x[1] ? 0 : 1] : x) })
+        })),
+        hasLinks: i.links.length > 0, links: i.links.map(l => ({ rel: l[0], title: l[1] })),
+        isFR: !!i.fr, frVotes: i.fr ? i.fr.votes : '', frRequester: i.fr ? i.fr.requester : '', frDate: i.fr ? 'submitted ' + i.fr.date : '',
+        convert: () => { this.patchItem(i.id, { board: 'mobile', status: 'nx', fr: i.fr }); this.say('Moved to Mobile app · Next up'); },
+        hasSource: !!i.source, sourceText: i.source ? 'source: ' + i.source : ''
+      };
+    }
+
+    // ---------- status editor
+    let se = null;
+    if (scr === 'statusEditor') {
+      const b = this.board(top.id);
+      const patch = (sid, p) => this.setState(s2 => ({ boards: s2.boards.map(x => x.id !== b.id ? x : Object.assign({}, x, { statuses: x.statuses.map(s => s.id === sid ? Object.assign({}, s, p) : s) })) }));
+      const move = (si, dir) => this.setState(s2 => ({
+        boards: s2.boards.map(x => { if (x.id !== b.id) return x; const arr = x.statuses.slice(); const j = si + dir; if (j < 0 || j >= arr.length) return x; const t = arr[si]; arr[si] = arr[j]; arr[j] = t; return Object.assign({}, x, { statuses: arr }); })
+      }));
+      se = {
+        boardName: b.name,
+        rows: b.statuses.map((s, si) => ({
+          name: s.name, color: s.color, cat: s.cat, isDefault: s.def,
+          wipText: s.wip ? 'wip ' + s.wip : 'no wip limit',
+          focusBorder: s.focus ? '#FF6B1A' : 'rgba(255,255,255,0.1)', focusColor: s.focus ? '#FF6B1A' : '#7E7B77',
+          setName: e => patch(s.id, { name: e.target.value }),
+          setCat: e => patch(s.id, { cat: e.target.value }),
+          toggleFocus: () => patch(s.id, { focus: !s.focus }),
+          cycleWip: () => patch(s.id, { wip: s.wip === null ? 2 : (s.wip >= 5 ? null : s.wip + 1) }),
+          pickColor: () => this.setState({ sheet: { kind: 'colorPicker', boardId: b.id, statusId: s.id } }),
+          up: () => move(si, -1), down: () => move(si, 1),
+          del: () => this.setState({ sheet: { kind: 'reassign', boardId: b.id, statusId: s.id } })
+        })),
+        add: () => this.setState(s2 => ({ boards: s2.boards.map(x => x.id !== b.id ? x : Object.assign({}, x, { statuses: x.statuses.concat([{ id: 'n' + Date.now(), name: 'New status', color: '#84818C', cat: 'backlog', wip: null, focus: false, def: false }]) })) }))
+      };
+    }
+
+    // ---------- simple screens
+    let sp = null;
+    if (scr === 'boardSettings') {
+      const b = this.board(top.id);
+      const cycle = (key, arr) => () => this.setState(s2 => ({ boards: s2.boards.map(x => x.id === b.id ? Object.assign({}, x, { [key]: arr[(arr.indexOf(x[key]) + 1) % arr.length] }) : x) }));
+      sp = {
+        title: 'Board settings', sub: b.name, sections: [
+          { name: 'Basics', rows: [
+            R('Name', { hasValue: true, value: b.name }),
+            R('Icon code', { hasValue: true, value: b.code, hasSub: true, sub: 'Two letters, monochrome — no emoji' }),
+            R('Accent colour', { hasDot: true, dot: b.accent, hasAction: true, actionLabel: 'Change', action: () => this.setState({ sheet: { kind: 'colorPicker', boardId: b.id } }) })
+          ] },
+          { name: 'Defaults', rows: [
+            R('View mode', { hasValue: true, value: b.view, cursor: 'pointer', tap: cycle('view', ['kanban', 'list', 'agenda']) }),
+            R('Group by', { hasValue: true, value: b.groupBy, cursor: 'pointer', tap: cycle('groupBy', ['status', 'due', 'priority', 'tag']) }),
+            R('Item type', { hasValue: true, value: 'task' }),
+            R('Statuses', { chevron: true, cursor: 'pointer', hasValue: true, value: b.statuses.length + ' statuses', tap: () => this.push({ screen: 'statusEditor', id: b.id }) })
+          ] },
+          { name: 'Portal', note: 'Requests filed against this slug on the website route to this board. Nothing imports until you confirm the preview.', rows: [
+            R('Portal slug', { hasValue: true, value: b.slug || 'not routed' }),
+            R('Landing status', { hasValue: true, value: this.status(b, 'bk').name })
+          ] },
+          { name: 'Danger', rows: [
+            R('Archive board', { hasSub: true, sub: 'Hides it and its items. Reversible.', hasAction: true, actionLabel: 'Archive', action: () => this.say('Archived ' + b.name) }),
+            R('Delete board', { hasSub: true, sub: 'Permanent, with its items.', hasDanger: true, dangerLabel: 'Delete', danger: () => this.setState({ sheet: { kind: 'confirmDelete', label: b.name } }) })
+          ] }
+        ]
+      };
+    }
+    if (scr === 'tagManager') {
+      sp = {
+        title: 'Tags', sub: st.tags.length + ' in use', sections: [{ name: 'All tags', rows: st.tags.map(t => R(t.name, {
+          hasDot: true, dot: t.color, hasValue: true, value: st.items.filter(i => i.tags.indexOf(t.id) >= 0).length + ' items',
+          hasAction: true, actionLabel: 'Merge', action: () => this.say('Merge ' + t.name + ' into…'),
+          hasDanger: true, dangerLabel: 'Delete', danger: () => this.setState({ sheet: { kind: 'confirmDelete', label: '#' + t.name, tagId: t.id } })
+        })) }]
+      };
+    }
+    if (scr === 'savedView') {
+      const v = st.views.filter(x => x.id === top.id)[0] || st.views[0];
+      const rows = (v.name === 'Overdue' ? overdue : st.items.filter(i => i.priority === 'urgent')).map(i => this.itemVM(i));
+      sp = {
+        title: v.name, sub: v.rule,
+        sections: rows.length ? [{ name: rows.length + ' items', note: 'Today, Inbox and Overdue are instances of this screen — one filter engine, no special cases.', rows: rows.map(r => R(r.title, { hasDot: true, dot: r.statusColor, hasSub: true, sub: r.boardName + (r.hasDue ? '  ·  ' + r.dueText : ''), cursor: 'pointer', chevron: true, tap: r.open })) }] : [],
+        emptyTitle: 'Nothing matches', emptyBody: 'This view is empty right now. It will fill itself when something does.'
+      };
+    }
+    if (scr === 'archive') {
+      sp = {
+        title: 'Archive', sub: st.archived.boards.length + ' boards · ' + st.archived.items.length + ' items', sections: [
+          { name: 'Boards', rows: st.archived.boards.map(b => R(b.name, { hasSub: true, sub: b.meta, hasAction: true, actionLabel: 'Restore', action: () => this.say('Restored ' + b.name), hasDanger: true, dangerLabel: 'Purge', danger: () => this.setState({ sheet: { kind: 'confirmDelete', label: b.name } }) })) },
+          { name: 'Items', rows: st.archived.items.map(i => R(i.title, { hasSub: true, sub: i.meta, hasAction: true, actionLabel: 'Restore', action: () => this.say('Restored “' + i.title + '”') })) }
+        ]
+      };
+    }
+    if (scr === 'settings') {
+      const set = p => this.setState(s2 => ({ settings: Object.assign({}, s2.settings, p) }));
+      const g = st.settings;
+      sp = {
+        title: 'Settings', sub: 'ProjectMate 0.7.2', sections: [
+          { name: 'Appearance', rows: [
+            R('Theme', { hasValue: true, value: g.theme, cursor: 'pointer', tap: () => set({ theme: g.theme === 'dark' ? 'system' : g.theme === 'system' ? 'light' : 'dark' }) }),
+            R('Dynamic colour', Object.assign({ hasSub: true, sub: 'Let the wallpaper tint surfaces', cursor: 'pointer', tap: () => set({ dynamic: !g.dynamic }) }, sw(g.dynamic))),
+            R('Start screen', { hasValue: true, value: g.start, cursor: 'pointer', tap: () => set({ start: g.start === 'Boards' ? 'Today' : 'Boards' }) })
+          ] },
+          { name: 'Data', rows: [
+            R('Export backup', { hasAction: true, actionLabel: 'Export', action: () => this.say('Wrote projectmate-2026-08-03.json') }),
+            R('Import backup', { hasAction: true, actionLabel: 'Choose', action: () => this.push({ screen: 'import' }) }),
+            R('Purge old tombstones', { hasSub: true, sub: '41 deletions older than 90 days', hasDanger: true, dangerLabel: 'Purge', danger: () => this.say('Purged 41 tombstones') }),
+            R('Storage', { hasValue: true, value: '2.1 MB' })
+          ] },
+          { name: 'Portal', note: 'Phase 2 adds an API token and a sync interval here.', rows: st.boards.filter(b => b.slug).map(b => R('/' + b.slug, { hasDot: true, dot: b.accent, hasValue: true, value: '→ ' + b.name })) },
+          { name: 'About', rows: [
+            R('Version', { hasValue: true, value: '0.7.2 (412)' }),
+            R('Documentation', { chevron: true, cursor: 'pointer' }),
+            R('Licences', { chevron: true, cursor: 'pointer' }),
+            R('Replay first run', { chevron: true, cursor: 'pointer', tap: () => this.setState({ onboarding: true }) })
+          ] }
+        ]
+      };
+    }
+    if (sp) {
+      sp.sections = (sp.sections || []).map(s => ({ name: s.name, rows: s.rows, hasNote: !!s.note, note: s.note || '' }));
+      sp.hasEmpty = sp.sections.length === 0;
+      sp.emptyTitle = sp.emptyTitle || ''; sp.emptyBody = sp.emptyBody || '';
+    }
+
+    // ---------- import preview
+    const impBoard = this.board(st.importTarget.board);
+    const imp = {
+      rejected: [
+        { row: 'row 4', title: '(no title)', reason: 'Title is required — the row carried only a body' },
+        { row: 'row 11', title: 'Sync with Todoist', reason: 'Duplicate of an existing request from the same portal id' }
+      ],
+      boardName: impBoard.name, statusName: this.status(impBoard, st.importTarget.status).name,
+      slugText: '/' + (impBoard.slug || 'requests') + '  →  ' + impBoard.name,
+      pickBoard: () => this.setState({ sheet: { kind: 'boardPicker', importTarget: true } }),
+      pickStatus: () => this.setState({ sheet: { kind: 'statusPicker', importTarget: true } }),
+      toggleRemember: () => this.setState(s2 => ({ importTarget: Object.assign({}, s2.importTarget, { remember: !s2.importTarget.remember }) })),
+      rememberBg: st.importTarget.remember ? '#FF6B1A' : '#2A2A32',
+      rememberJustify: st.importTarget.remember ? 'flex-end' : 'flex-start',
+      rememberKnob: st.importTarget.remember ? '#0B0B0C' : '#6E6B67',
+      confirm: () => {
+        const b = impBoard, sid = st.importTarget.status;
+        const titles = ['Bulk edit selected items', 'Sort a board by drag', 'Print a board', 'Reminders before due time', 'Sub-items'];
+        const news = titles.map((t, k) => ({ id: 'im' + k, board: b.id, status: sid, title: t, priority: 'normal', due: null, allDay: false, time: '17:00', tags: [], checklist: [], notes: '', source: 'imported', links: [] }));
+        this.setState(s2 => ({ items: s2.items.concat(news) }));
+        this.pop(); this.say('Committed 15 items to ' + b.name + ' in one transaction');
+      }
+    };
+
+    // ---------- onboarding
+    const obSeeds = ['Projects', 'Life'];
+    const ob = {
+      options: [
+        { key: 'Projects', name: 'Projects', statuses: 'backlog · next up · in progress · blocked · in review · done' },
+        { key: 'Life', name: 'Life', statuses: 'to do · doing · waiting on · done' },
+        { key: 'Reading', name: 'Reading', statuses: 'to read · reading · finished' }
+      ].map(o => {
+        const on2 = obSeeds.indexOf(o.key) >= 0;
+        return Object.assign({}, o, {
+          tick: on2 ? '✓' : '', mark: on2 ? '#FF6B1A' : '#4A4A52', markBg: on2 ? '#FF6B1A' : 'transparent',
+          border: on2 ? 'rgba(255,107,26,0.4)' : 'rgba(255,255,255,0.07)',
+          toggle: () => this.say(on2 ? 'Deselecting is wired to real state in the build' : 'Would seed a ' + o.name + ' board')
+        });
+      }),
+      cta: 'Seed 2 boards', skip: () => this.setState({ onboarding: false }),
+      seed: () => { this.setState({ onboarding: false, tab: 'boards' }); this.say('Seeded Projects and Life'); }
+    };
+
+    // ---------- sheets
+    const sheet = st.sheet || {};
+    const closeSheet = () => this.setState({ sheet: null });
+    let sh = { title: '', hasSub: false, sub: '' };
+    const SR = (label, o) => Object.assign({ label, color: '#F2F0EE', hasDot: false, dot: '#5C5C64', hasSub: false, sub: '', checked: false, tap: closeSheet }, o || {});
+    const sheetItem = sheet.itemId ? this.item(sheet.itemId) : null;
+    if (sheet.kind === 'quickAdd') {
+      const q2 = st.quick, parsed = [];
+      if (/!!/.test(q2)) parsed.push({ kind: 'priority', value: 'urgent', color: '#FF6B1A', bg: 'rgba(255,107,26,0.14)' });
+      (q2.match(/#[a-z]+/g) || []).forEach(t => parsed.push({ kind: 'tag', value: t, color: '#C9C6C2', bg: '#1D1D23' }));
+      (q2.match(/@[a-z]+/g) || []).forEach(t => parsed.push({ kind: 'board', value: t, color: '#C9C6C2', bg: '#1D1D23' }));
+      const dm = q2.match(/tomorrow|fri|today/i);
+      if (dm) parsed.push({ kind: 'due', value: dm[0].toLowerCase(), color: '#FF6B1A', bg: 'rgba(255,107,26,0.14)' });
+      sh = {
+        title: 'Quick add', hasSub: true, sub: 'Lands in the Inbox unless you name a board.', isQuickAdd: true,
+        quick: st.quick, setQuick: e => this.setState({ quick: e.target.value }), parsed,
+        addQuick: () => {
+          const raw = st.quick.trim(); if (!raw) return closeSheet();
+          const title = raw.replace(/!!/g, '').replace(/#[a-z]+/g, '').replace(/@[a-z]+/g, '').replace(/\b(tomorrow|fri|today)\b/gi, '').replace(/\s+/g, ' ').trim();
+          const tags = (raw.match(/#[a-z]+/g) || []).map(t => t.slice(1)).filter(t => this.tag(t));
+          const bTag = (raw.match(/@([a-z]+)/) || [])[1];
+          const b = sheet.boardId ? this.board(sheet.boardId) : st.boards.filter(x => x.id.indexOf(bTag || '\u0000') === 0 || x.name.toLowerCase().indexOf(bTag || '\u0000') === 0)[0];
+          const due = /tomorrow/i.test(raw) ? '2026-08-04' : /today/i.test(raw) ? this.T : /fri/i.test(raw) ? '2026-08-07' : null;
+          if (b) {
+            const sid = sheet.statusId || (b.statuses.filter(s => s.def)[0] || b.statuses[0]).id;
+            this.setState(s2 => ({ items: s2.items.concat([{ id: 'q' + Date.now(), board: b.id, status: sid, title, priority: /!!/.test(raw) ? 'urgent' : 'normal', due, allDay: !!due, time: '17:00', tags, checklist: [], notes: '', source: null, links: [] }]), sheet: null, quick: '' }));
+            this.say('Added to ' + b.name);
+          } else {
+            this.setState(s2 => ({ inbox: s2.inbox.concat([{ id: 'q' + Date.now(), title, source: 'shared', body: 'Quick add · ' + (due ? 'due ' + due : 'no date'), requester: '', votes: 0 }]), sheet: null, quick: '' }));
+            this.say('Captured to Inbox');
+          }
+        }
+      };
+    } else if (sheet.kind === 'datePicker') {
+      const i = sheetItem;
+      const opts = [['Today', this.T, 'Mon 3 Aug'], ['Tomorrow', '2026-08-04', 'Tue 4 Aug'], ['This Friday', '2026-08-07', 'Fri 7 Aug'], ['Next Monday', '2026-08-10', 'Mon 10 Aug'], ['In two weeks', '2026-08-17', 'Mon 17 Aug'], ['No date', null, 'clear']];
+      sh = {
+        title: 'Due date', isDate: true,
+        allDayBg: i && i.allDay ? '#FF6B1A' : '#2A2A32', allDayJustify: i && i.allDay ? 'flex-end' : 'flex-start', allDayKnob: i && i.allDay ? '#0B0B0C' : '#6E6B67',
+        toggleAllDay: () => this.patchItem(i.id, { allDay: !i.allDay }),
+        dates: opts.map(o => ({
+          name: o[0], sub: o[2], set: () => { this.patchItem(i.id, { due: o[1] }); closeSheet(); this.say(o[1] ? 'Due ' + o[0].toLowerCase() : 'Due date cleared'); },
+          bg: i && i.due === o[1] ? 'rgba(255,107,26,0.14)' : '#0F0F13',
+          border: i && i.due === o[1] ? 'rgba(255,107,26,0.45)' : 'rgba(255,255,255,0.07)',
+          color: i && i.due === o[1] ? '#FF6B1A' : '#F2F0EE'
+        }))
+      };
+    } else if (sheet.kind === 'statusPicker') {
+      const b = sheet.importTarget ? impBoard : this.board(sheetItem.board);
+      const catName = { backlog: 'backlog', active: 'active', blocked: 'blocked', done: 'done · terminal' };
+      sh = {
+        title: 'Status', hasSub: true, sub: 'Grouped by category.', hasList: true,
+        groups: ['backlog', 'active', 'blocked', 'done'].map(c => ({
+          hasName: true, name: catName[c], rows: b.statuses.filter(s => s.cat === c).map(s => SR(s.name, {
+            hasDot: true, dot: s.color,
+            checked: sheet.importTarget ? st.importTarget.status === s.id : sheetItem.status === s.id,
+            hasSub: !!s.wip, sub: s.wip ? 'wip limit ' + s.wip : '',
+            tap: () => { if (sheet.importTarget) this.setState(s2 => ({ importTarget: Object.assign({}, s2.importTarget, { status: s.id }), sheet: null })); else { this.patchItem(sheetItem.id, { status: s.id }); closeSheet(); } }
+          }))
+        })).filter(g => g.rows.length)
+      };
+    } else if (sheet.kind === 'tagPicker') {
+      const i = sheetItem;
+      sh = {
+        title: 'Tags', hasList: true, hasCreate: true,
+        newTag: st.quick, setNewTag: e => this.setState({ quick: e.target.value }),
+        createTag: () => { const n = st.quick.trim().replace(/^#/, ''); if (!n) return; this.setState(s2 => ({ tags: s2.tags.concat([{ id: n, name: n, color: '#84818C' }]), quick: '' })); this.say('Created #' + n); },
+        groups: [{ hasName: false, name: '', rows: st.tags.map(t => SR('#' + t.name, {
+          hasDot: true, dot: t.color, checked: !!(i && i.tags.indexOf(t.id) >= 0),
+          hasSub: true, sub: st.items.filter(x => x.tags.indexOf(t.id) >= 0).length + ' items',
+          tap: () => { if (i) this.patchItem(i.id, { tags: i.tags.indexOf(t.id) >= 0 ? i.tags.filter(x => x !== t.id) : i.tags.concat([t.id]) }); else this.say('Tagged with #' + t.name); }
+        })) }]
+      };
+    } else if (sheet.kind === 'boardPicker') {
+      sh = {
+        title: 'Move to board', hasList: true,
+        groups: [{ hasName: false, name: '', rows: st.boards.map(b => SR(b.name, {
+          hasDot: true, dot: b.accent, hasSub: true, sub: b.statuses.map(s => s.name.toLowerCase()).join(' · '),
+          checked: sheet.importTarget && st.importTarget.board === b.id,
+          tap: () => {
+            if (sheet.importTarget) return this.setState(s2 => ({ importTarget: Object.assign({}, s2.importTarget, { board: b.id, status: (b.statuses.filter(s => s.def)[0] || b.statuses[0]).id }), sheet: null }));
+            const land = (b.statuses.filter(s => s.def)[0] || b.statuses[0]).id;
+            if (sheet.inboxId) {
+              const n = st.inbox.filter(x => x.id === sheet.inboxId)[0];
+              this.setState(s2 => ({
+                inbox: s2.inbox.filter(x => x.id !== sheet.inboxId), sheet: null,
+                items: s2.items.concat([{ id: 'x' + Date.now(), board: b.id, status: land, title: n.title, priority: 'normal', due: null, allDay: false, time: '17:00', tags: [], checklist: [], notes: n.body, source: n.source, links: [], fr: n.votes ? { requester: n.requester, votes: n.votes, date: '1 Aug 2026' } : undefined }])
+              }));
+              this.say('Moved to ' + b.name);
+            } else if (sheet.bulk) {
+              const ns = st.inbox.filter(x => st.selected.indexOf(x.id) >= 0);
+              this.setState(s2 => ({
+                inbox: s2.inbox.filter(x => s2.selected.indexOf(x.id) < 0), selected: [], bulkMode: false, sheet: null,
+                items: s2.items.concat(ns.map((n, k) => ({ id: 'x' + Date.now() + k, board: b.id, status: land, title: n.title, priority: 'normal', due: null, allDay: false, time: '17:00', tags: [], checklist: [], notes: n.body, source: n.source, links: [] })))
+              }));
+              this.say('Moved ' + ns.length + ' items to ' + b.name);
+            } else if (sheet.itemId) { this.patchItem(sheet.itemId, { board: b.id, status: land }); closeSheet(); this.say('Moved to ' + b.name); }
+            else closeSheet();
+          }
+        })) }]
+      };
+    } else if (sheet.kind === 'colorPicker') {
+      const pal = ['#FF6B1A', '#E2453C', '#C9A227', '#2E9E8F', '#4A8FE7', '#8B7BE8', '#D9628E', '#6E8B74', '#84818C', '#5C5C64'];
+      sh = {
+        title: 'Colour', hasSub: true, sub: 'Shared by boards and statuses.', isColor: true,
+        swatches: pal.map(c => ({
+          color: c, ring: 'transparent',
+          set: () => {
+            this.setState(s2 => ({ boards: s2.boards.map(b => b.id !== sheet.boardId ? b : (sheet.statusId ? Object.assign({}, b, { statuses: b.statuses.map(s => s.id === sheet.statusId ? Object.assign({}, s, { color: c }) : s) }) : Object.assign({}, b, { accent: c }))), sheet: null }));
+          }
+        }))
+      };
+    } else if (sheet.kind === 'confirmDelete') {
+      sh = {
+        title: 'Delete ' + sheet.label + '?', hasSub: true, sub: 'This one is not reversible. Archive instead if you might want it back.',
+        isConfirm: true, confirmLabel: 'Delete',
+        confirm: () => { if (sheet.tagId) this.setState(s2 => ({ tags: s2.tags.filter(t => t.id !== sheet.tagId) })); closeSheet(); this.say('Deleted ' + sheet.label); }
+      };
+    } else if (sheet.kind === 'reassign') {
+      const b = this.board(sheet.boardId), s = this.status(b, sheet.statusId);
+      const n = st.items.filter(i => i.board === b.id && i.status === s.id).length;
+      sh = {
+        title: 'Delete “' + s.name + '”', hasSub: true, sub: n + ' items still use it. Pick where they go — the app will not orphan them.', hasList: true,
+        groups: [{ hasName: false, name: '', rows: b.statuses.filter(x => x.id !== s.id).map(x => SR(x.name, {
+          hasDot: true, dot: x.color, hasSub: true, sub: 'category ' + x.cat,
+          tap: () => {
+            this.setState(s2 => ({
+              items: s2.items.map(i => i.board === b.id && i.status === s.id ? Object.assign({}, i, { status: x.id }) : i),
+              boards: s2.boards.map(bb => bb.id !== b.id ? bb : Object.assign({}, bb, { statuses: bb.statuses.filter(y => y.id !== s.id) })), sheet: null
+            }));
+            this.say(n + ' items moved to ' + x.name);
+          }
+        })) }]
+      };
+    } else if (sheet.kind === 'newBoard') {
+      const tpl = [
+        { name: 'Project', sub: 'backlog · next up · in progress (wip 3, focus) · blocked · in review · done' },
+        { name: 'Life', sub: 'to do · doing (focus) · waiting on · done' },
+        { name: 'Reading list', sub: 'to read · reading (focus) · finished' },
+        { name: 'Blank', sub: 'one status: to do' }
+      ];
+      sh = {
+        title: 'New board', hasSub: true, sub: 'Every template shows its statuses and their categories before you commit.', hasList: true,
+        groups: [{ hasName: false, name: '', rows: tpl.map(t => SR(t.name, { hasSub: true, sub: t.sub, tap: () => { closeSheet(); this.say('Created a ' + t.name.toLowerCase() + ' board'); } })) }]
+      };
+    } else if (sheet.kind === 'homeOverflow') {
+      sh = {
+        title: 'Boards', hasList: true, groups: [{ hasName: false, name: '', rows: [
+          SR('Archive', { tap: () => this.push({ screen: 'archive' }) }),
+          SR('Tag manager', { tap: () => this.push({ screen: 'tagManager' }) }),
+          SR('Settings', { tap: () => this.push({ screen: 'settings' }) })
+        ] }]
+      };
+    } else if (sheet.kind === 'boardOverflow') {
+      sh = {
+        title: this.board(sheet.boardId).name, hasList: true, groups: [{ hasName: false, name: '', rows: [
+          SR('Statuses', { hasSub: true, sub: 'Rename, reorder, categories, WIP limits', tap: () => this.push({ screen: 'statusEditor', id: sheet.boardId }) }),
+          SR('Board settings', { tap: () => this.push({ screen: 'boardSettings', id: sheet.boardId }) }),
+          SR('Import into this board', { tap: () => this.push({ screen: 'import' }) }),
+          SR('Archive', { tap: () => this.push({ screen: 'archive' }) })
+        ] }]
+      };
+    }
+
+    return {
+      showIndex, indexRows, back, closeSheet,
+      atBoard: scr === 'board', bd,
+      atItem: scr === 'item', dt,
+      atStatusEditor: scr === 'statusEditor', se,
+      atSimple: !!sp, sp,
+      atImport: scr === 'import', imp,
+      atOnboarding: st.onboarding, ob,
+      hasSheet: !!st.sheet, sh,
+      openQuickAdd: () => this.setState({ sheet: { kind: 'quickAdd' }, quick: '' }),
+      atBoards: at('boards'), atToday: at('today'), atInbox: at('inbox'), atSearch: at('search'),
+      showNav: ['boards', 'today', 'inbox', 'search'].indexOf(scr) >= 0 && !st.onboarding,
+      tabs: { boards: tabVM('boards'), today: tabVM('today'), inbox: tabVM('inbox'), search: tabVM('search') },
+      goBoards: () => this.setState({ tab: 'boards' }), goToday: () => this.setState({ tab: 'today' }),
+      goInbox: () => this.setState({ tab: 'inbox' }), goSearch: () => this.setState({ tab: 'search' }),
+      hasInbox: st.inbox.length > 0, inboxCount: st.inbox.length,
+      smartChips: [
+        { name: 'Today', count: overdue.length + dueToday.length, dot: '#FF6B1A', open: () => this.setState({ tab: 'today' }) },
+        { name: 'Inbox', count: st.inbox.length, dot: '#4A8FE7', open: () => this.setState({ tab: 'inbox' }) },
+        { name: 'Overdue', count: overdue.length, dot: '#E2453C', open: () => this.push({ screen: 'savedView', id: 'v1' }) }
+      ],
+      boardGroups,
+      openHomeOverflow: () => this.setState({ sheet: { kind: 'homeOverflow' } }),
+      openNewBoard: () => this.setState({ sheet: { kind: 'newBoard' } }),
+      todaySections, todayEmpty: todaySections.length === 0,
+      inboxGroups, inboxEmpty: st.inbox.length === 0,
+      bulkMode: st.bulkMode, selCount: st.selected.length,
+      bulkBorder: st.bulkMode ? '#FF6B1A' : 'rgba(255,255,255,0.14)', bulkColor: st.bulkMode ? '#FF6B1A' : '#F2F0EE',
+      toggleBulk: () => this.setState(s => ({ bulkMode: !s.bulkMode, selected: [] })),
+      bulkMove: () => this.setState({ sheet: { kind: 'boardPicker', bulk: true } }),
+      bulkDismiss: () => { this.setState(s => ({ inbox: s.inbox.filter(n => s.selected.indexOf(n.id) < 0), selected: [], bulkMode: false })); this.say('Dismissed ' + st.selected.length + ' items'); },
+      openImport: () => this.push({ screen: 'import' }),
+      query: st.query, setQuery: e => this.setState({ query: e.target.value }),
+      filterChips: fkinds.map(f => ({
+        label: f[1], toggle: () => this.setState(s => ({ filters: on(f[0]) ? s.filters.filter(x => x !== f[0]) : s.filters.concat([f[0]]) })),
+        border: on(f[0]) ? '#FF6B1A' : 'rgba(255,255,255,0.12)', bg: on(f[0]) ? 'rgba(255,107,26,0.14)' : 'transparent', color: on(f[0]) ? '#FF6B1A' : '#C9C6C2'
+      })),
+      resultCount: results.length + ' items' + (st.filters.length ? '  ·  ' + st.filters.length + ' filters' : ''),
+      searchGroups, canSaveView: !!(q || st.filters.length),
+      saveView: () => { const name = st.query.trim() || 'Filtered view'; this.setState(s => ({ views: s.views.concat([{ id: 'v' + (s.views.length + 1), name: name, rule: (q ? '“' + q + '” · ' : '') + (st.filters.length ? st.filters.length + ' filters' : 'no filters') }]) })); this.push({ screen: 'savedView', id: 'v' + (st.views.length + 1) }); },
+      hasToast: !!st.toast, toast: st.toast
+    };
+  }
+
+  jump(scr) { this.setState(st => ({ stacks: Object.assign({}, st.stacks, { [st.tab]: [scr] }), sheet: null, onboarding: false })); }
+}
+</script>
+</body>
+</html>

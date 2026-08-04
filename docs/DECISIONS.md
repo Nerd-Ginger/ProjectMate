@@ -249,6 +249,25 @@ regardless of OS version, which starts to matter once sync exists.
 rejects blocking DAO functions — every DAO function must be `suspend` or return
 `Flow`. The latter is a discipline, not a limitation.
 
+**Verified 2026-08-04, with one correction.** The claim above was written
+without ever being executed. It is true — `Room.inMemoryDatabaseBuilder<T>()`
+needs no `Context`, and `app/src/test/.../BoardDaoTest.kt` now runs four real
+DAO tests on a plain JVM, no emulator and no Robolectric.
+
+What was missing is that **the test classpath needs the JVM variant of the
+native library**, `androidx.sqlite:sqlite-bundled-jvm`. The plain
+`sqlite-bundled` dependency resolves to the Android artifact, whose `.so` files
+target Android ABIs; a desktop JVM cannot load them and every test dies with:
+
+```
+java.lang.UnsatisfiedLinkError: no sqliteJni in java.library.path
+```
+
+which then cascades into `NoClassDefFoundError: Could not initialize class
+BundledSQLiteDriver$NativeLibraryObject` and reads like a Room problem rather
+than a packaging one. One dependency line fixes it. The decision stands; the
+justification just needed the footnote it never got.
+
 ---
 
 ## D-012 — Pin the toolchain explicitly; no Gradle toolchain block
@@ -355,3 +374,54 @@ for years and needs none of it.
 The `release` build type is also left at its defaults for now. CI only assembles
 debug, and minification is another thing to get wrong while the build is being
 stabilised; it will be configured before there is ever a release to ship.
+
+---
+
+## D-016 — A fixed dark theme; no Material You
+
+**2026-08-04 · Accepted**
+
+The app ships one colour scheme: the near-black-and-orange design in
+`design/ProjectMate.dc.html`. `dynamicColor` is gone, and there is no light
+variant.
+
+**Considered:** keeping Material You, which is the Android default and was what
+the app actually shipped until now.
+
+**Why:** dynamic colour derives the whole scheme from the device wallpaper. On
+the test device that produced a pastel lavender-and-mint app — pleasant, and
+completely unrelated to the design. The accent orange is the one thing that
+makes ProjectMate recognisable, and Material You replaces exactly that.
+
+The trade is real and accepted: the app no longer matches a user's system
+theming. For a single-user tool with a deliberate visual identity, matching the
+design wins.
+
+**Board accents are still per-board** — they come from the board's own
+`accentColor` and drive the monogram tile. It's the chrome that's fixed, not
+the content.
+
+**Costs:** no light theme means the app is dark in a bright room. Adding one
+later means defining a second full palette, since the design only specifies
+dark. Not free, but not blocked either.
+
+---
+
+## D-017 — The back stack survives configuration changes
+
+**2026-08-04 · Accepted**
+
+`rememberNavigator()` uses `rememberSaveable` with an explicit `Saver` that
+encodes every tab's stack, rather than plain `remember`.
+
+**Why:** `remember` is scoped to the composition, which Android throws away on
+rotation. Found by rotating a device while looking at a board: the app returned
+to the Boards root, silently losing your place. With four independent tab
+stacks, that's four places lost at once.
+
+Screens carry at most one string argument, so each encodes as `type:arg` split
+on the first colon — ids can contain anything without escaping.
+
+**`ImportPreview` is deliberately not restored** and degrades to the Boards
+root. Its argument is an entire JSON payload, and reviving a half-confirmed
+import after process death is worse than asking for the file again.

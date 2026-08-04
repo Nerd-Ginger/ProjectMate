@@ -66,6 +66,7 @@ Requires JDK 17+ and the Android SDK (Android Studio installs both).
 core/     Pure Kotlin. Domain models, board templates, Today rules,
           import/export schemas. No Android dependencies — testable anywhere.
 app/      The Android app. Room storage, Compose UI, ViewModels.
+design/   The UI comp — every screen and sheet, rendered. Open the .html.
 docs/     Intent, architecture, data model, roadmap, infrastructure costs.
 ```
 

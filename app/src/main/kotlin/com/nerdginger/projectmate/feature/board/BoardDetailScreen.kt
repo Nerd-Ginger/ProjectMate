@@ -1,12 +1,14 @@
 package com.nerdginger.projectmate.feature.board
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,19 +18,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,9 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.nerdginger.projectmate.designsystem.LocalProjectMateTokens
 import com.nerdginger.projectmate.core.model.Item
 import com.nerdginger.projectmate.core.model.Priority
 
@@ -104,16 +102,25 @@ private fun StatusColumn(
     onAdvance: (Item) -> Unit,
     onOpenItem: (String) -> Unit,
 ) {
+    val tokens = LocalProjectMateTokens.current
     var draft by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.width(280.dp),
+        modifier = Modifier
+            .width(280.dp)
+            // Full height, so the add field sits at the bottom of a tall column
+            // rather than the card shrink-wrapping around whatever is in it.
+            .fillMaxHeight()
+            .clip(RoundedCornerShape(14.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
+            .border(1.dp, tokens.cardBorder, RoundedCornerShape(14.dp))
+            .padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         ColumnHeader(column)
 
         LazyColumn(
-            modifier = Modifier.weight(1f, fill = false),
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(column.items, key = { it.id }) { item ->
@@ -129,9 +136,19 @@ private fun StatusColumn(
         OutlinedTextField(
             value = draft,
             onValueChange = { draft = it },
-            placeholder = { Text("Add…") },
+            placeholder = { Text("Add item", style = MaterialTheme.typography.bodyMedium) },
             singleLine = true,
+            shape = RoundedCornerShape(9.dp),
             modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = tokens.chipBorder,
+                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.primary,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(
                 onDone = {
@@ -145,35 +162,39 @@ private fun StatusColumn(
 
 @Composable
 private fun ColumnHeader(column: Column) {
+    val tokens = LocalProjectMateTokens.current
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Surface(
-            modifier = Modifier.size(10.dp),
-            shape = CircleShape,
-            color = Color(column.status.colorArgb),
-        ) {}
+        // A small rounded square, not a dot — matches the swatch shape used in
+        // the progress-bar legend so the same colour reads as the same thing.
+        Box(
+            Modifier
+                .size(8.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(Color(column.status.colorArgb)),
+        )
 
         Text(
             text = column.status.name,
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.weight(1f),
         )
 
         Text(
             text = column.status.wipLimit?.let { "${column.items.size}/$it" }
                 ?: "${column.items.size}",
-            style = MaterialTheme.typography.labelMedium,
             // A WIP limit is a nudge, not a rule — nothing is prevented, the
             // count just stops looking calm about it.
-            color = if (column.isOverWipLimit) {
-                MaterialTheme.colorScheme.error
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            },
+            style = tokens.mono.copy(
+                color = if (column.isOverWipLimit) {
+                    MaterialTheme.colorScheme.onErrorContainer
+                } else {
+                    tokens.mono.color
+                },
+            ),
         )
     }
 }
@@ -185,49 +206,68 @@ private fun ItemCard(
     onAdvance: () -> Unit,
     onClick: () -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        ),
+    val tokens = LocalProjectMateTokens.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .border(1.dp, tokens.cardBorder, RoundedCornerShape(10.dp))
+            .clickable(onClick = onClick)
+            .padding(start = 12.dp, top = 10.dp, bottom = 10.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Row(
-            modifier = Modifier.padding(start = 12.dp, top = 10.dp, bottom = 10.dp, end = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            item.priority.indicator()?.let { color ->
-                Box(
-                    Modifier
-                        .size(width = 3.dp, height = 28.dp)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(color),
-                )
-            }
-
-            Text(
-                text = item.title,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(1f),
+        item.priority.indicator()?.let { color ->
+            Box(
+                Modifier
+                    .size(width = 3.dp, height = 28.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(color),
             )
+        }
 
-            if (canAdvance) {
-                IconButton(onClick = onAdvance, modifier = Modifier.size(32.dp)) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "Move to next status",
-                        modifier = Modifier.size(18.dp),
-                    )
-                }
+        Text(
+            text = item.title,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(1f),
+        )
+
+        if (canAdvance) {
+            // The comp's advance affordance: a small orange-tinted tile, not a
+            // bare icon button. One tap is the common case, so it gets colour.
+            Box(
+                modifier = Modifier
+                    .size(width = 26.dp, height = 22.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .clickable(onClick = onAdvance),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Move to next status",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(14.dp),
+                )
             }
         }
     }
 }
 
-/** Null for [Priority.NONE] — most items have no priority and need no mark. */
-private fun Priority.indicator(): Color? = when (this) {
-    Priority.NONE -> null
-    Priority.LOW -> Color(0xFF94A3B8)
-    Priority.NORMAL -> Color(0xFF3B82F6)
-    Priority.URGENT -> Color(0xFFEF4444)
+/**
+ * Null for [Priority.NONE] — most items have no priority and need no mark.
+ *
+ * Urgent borrows the blocked red; the palette has exactly one alarm colour and
+ * two would dilute it.
+ */
+@Composable
+private fun Priority.indicator(): Color? {
+    val tokens = LocalProjectMateTokens.current
+    return when (this) {
+        Priority.NONE -> null
+        Priority.LOW -> tokens.done
+        Priority.NORMAL -> tokens.accents[0]
+        Priority.URGENT -> tokens.blocked
+    }
 }

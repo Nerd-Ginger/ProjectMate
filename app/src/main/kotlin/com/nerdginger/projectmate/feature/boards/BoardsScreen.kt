@@ -1,35 +1,46 @@
 package com.nerdginger.projectmate.feature.boards
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.nerdginger.projectmate.core.model.Board
 import com.nerdginger.projectmate.core.model.BoardProgress
 import com.nerdginger.projectmate.core.model.BoardType
 import com.nerdginger.projectmate.core.model.StatusCategory
 import com.nerdginger.projectmate.core.model.SyncMeta
 import com.nerdginger.projectmate.data.repository.BoardSummary
+import com.nerdginger.projectmate.designsystem.LocalProjectMateTokens
 import com.nerdginger.projectmate.designsystem.ProjectMateTheme
 import com.nerdginger.projectmate.designsystem.component.BoardProgressBar
+import com.nerdginger.projectmate.designsystem.component.BoardProgressLegend
 
 /**
  * The collections list — the answer to "what am I tracking?".
@@ -52,7 +63,6 @@ fun BoardsScreen(
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         if (state.pinned.isNotEmpty()) {
             item { SectionHeader("Pinned") }
@@ -70,14 +80,28 @@ fun BoardsScreen(
     }
 }
 
+/**
+ * A wide-tracked monospace label with a hairline rule running to the edge —
+ * the comp's way of separating groups without a heavy divider.
+ */
 @Composable
 private fun SectionHeader(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
-    )
+    val tokens = LocalProjectMateTokens.current
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 10.dp),
+    ) {
+        Text(text.uppercase(), style = tokens.sectionLabel)
+        Box(
+            Modifier
+                .weight(1f)
+                .height(1.dp)
+                .background(tokens.divider),
+        )
+    }
 }
 
 @Composable
@@ -86,68 +110,113 @@ private fun BoardCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val tokens = LocalProjectMateTokens.current
     val board = summary.board
     val progress = summary.progress
+    val accent = Color(board.accentColor)
 
-    Card(
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        ),
+            .padding(horizontal = 20.dp, vertical = 5.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .border(1.dp, tokens.cardBorder, RoundedCornerShape(14.dp))
+            .clickable(onClick = onClick)
+            .padding(14.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                board.emoji?.let { Text(it, style = MaterialTheme.typography.titleLarge) }
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        text = board.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(board.accentColor),
-                    )
-                    Text(
-                        text = summaryLine(progress),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+            BoardAvatar(board.name, accent)
+
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = board.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = summaryLine(progress),
+                    style = tokens.mono,
+                    modifier = Modifier.padding(top = 2.dp),
+                )
             }
 
-            BoardProgressBar(progress)
+            // A pinned board gets the accent diamond the comp puts top-right.
+            if (board.isPinned) {
+                Box(
+                    Modifier
+                        .size(8.dp)
+                        .rotate(45f)
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(MaterialTheme.colorScheme.primary),
+                )
+            }
         }
+
+        if (progress.total > 0) {
+            BoardProgressBar(progress, Modifier.padding(top = 13.dp))
+            BoardProgressLegend(progress, Modifier.padding(top = 9.dp))
+        }
+    }
+}
+
+/**
+ * Two-letter monogram on a tinted square, in the board's accent.
+ *
+ * The comp uses these rather than the emoji the data model carries — they stay
+ * legible at 34dp and give every board the same visual weight.
+ */
+@Composable
+private fun BoardAvatar(name: String, accent: Color) {
+    Box(
+        modifier = Modifier
+            .size(34.dp)
+            .clip(RoundedCornerShape(9.dp))
+            .background(accent.copy(alpha = 0.16f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = monogram(name),
+            color = accent,
+            fontFamily = FontFamily.Monospace,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 0.5.sp,
+        )
+    }
+}
+
+/** First letters of the first two words, else the first two characters. */
+private fun monogram(name: String): String {
+    val words = name.trim().split(" ").filter { it.isNotBlank() }
+    return when {
+        words.size >= 2 -> "${words[0].first()}${words[1].first()}".uppercase()
+        else -> name.trim().take(2).uppercase()
     }
 }
 
 /**
  * The one-line summary under a board's name.
  *
- * Leads with what's blocked when anything is: a stalled board is the thing
- * most worth noticing from the home screen, and it's exactly what a single
- * completion percentage would hide.
+ * Says how much is still open — the comp's "5 open". The per-category detail
+ * lives in the legend immediately below, so repeating it here would be noise.
  */
 private fun summaryLine(progress: BoardProgress): String {
-    if (progress.total == 0) return "Nothing here yet"
+    if (progress.total == 0) return "nothing here yet"
 
-    val parts = buildList {
-        if (progress.blocked > 0) add("${progress.blocked} blocked")
-        val active = progress.countsByCategory[StatusCategory.ACTIVE] ?: 0
-        if (active > 0) add("$active active")
-        add("${progress.completed}/${progress.total - (progress.countsByCategory[StatusCategory.CANCELLED] ?: 0)} done")
-    }
-    return parts.joinToString(" · ")
+    val cancelled = progress.countsByCategory[StatusCategory.CANCELLED] ?: 0
+    val open = progress.total - progress.completed - cancelled
+    return if (open > 0) "$open open" else "all done"
 }
 
 @Composable
 private fun EmptyBoards(modifier: Modifier = Modifier) {
+    val tokens = LocalProjectMateTokens.current
     Column(
         modifier = modifier.fillMaxSize().padding(32.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
@@ -158,7 +227,7 @@ private fun EmptyBoards(modifier: Modifier = Modifier) {
             text = "Create one from a template — Projects for things you're building, " +
                 "Life for everything else.",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = tokens.mono.color,
             textAlign = TextAlign.Center,
         )
     }
@@ -183,33 +252,39 @@ private fun previewBoard(
     sync = SyncMeta(createdAt = 0, updatedAt = 0),
 )
 
-@Preview(showBackground = true, widthDp = 380)
+@Preview(showBackground = true, widthDp = 380, backgroundColor = 0xFF0B0B0C)
 @Composable
 private fun BoardsScreenPreview() {
-    ProjectMateTheme(dynamicColor = false) {
+    ProjectMateTheme {
         BoardsScreen(
             state = BoardsUiState(
                 isLoading = false,
                 pinned = listOf(
                     BoardSummary(
-                        previewBoard("1", "Inbox", "📨", 0xFFF59E0B.toInt(), pinned = true),
-                        BoardProgress(mapOf(StatusCategory.INBOX to 3)),
+                        previewBoard("1", "Portal v2", "📨", 0xFF4A8FE7.toInt(), pinned = true),
+                        BoardProgress(
+                            mapOf(
+                                StatusCategory.BACKLOG to 2,
+                                StatusCategory.ACTIVE to 2,
+                                StatusCategory.BLOCKED to 1,
+                                StatusCategory.DONE to 1,
+                            ),
+                        ),
                     ),
                 ),
                 others = listOf(
                     BoardSummary(
-                        previewBoard("2", "Projects", "🛠️", 0xFF6366F1.toInt()),
+                        previewBoard("2", "Feature requests", "🛠️", 0xFFD9628E.toInt()),
                         BoardProgress(
                             mapOf(
-                                StatusCategory.BACKLOG to 4,
-                                StatusCategory.ACTIVE to 2,
-                                StatusCategory.BLOCKED to 1,
-                                StatusCategory.DONE to 5,
+                                StatusCategory.BACKLOG to 2,
+                                StatusCategory.ACTIVE to 1,
+                                StatusCategory.DONE to 3,
                             ),
                         ),
                     ),
                     BoardSummary(
-                        previewBoard("3", "Life", "🌱", 0xFF14B8A6.toInt()),
+                        previewBoard("3", "House", "🌱", 0xFF2E9E8F.toInt()),
                         BoardProgress(mapOf(StatusCategory.ACTIVE to 2, StatusCategory.DONE to 9)),
                     ),
                 ),

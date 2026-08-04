@@ -86,13 +86,39 @@ one. Confirm with:
 
 If `:app` isn't listed, fix the SDK detection rather than the checkout.
 
+### If Gradle says "Unable to delete directory"
+
+```
+java.io.IOException: Unable to delete directory '…\app\build\intermediates\…'
+Failed to delete some children. This might happen because a process has files
+open or has its working directory set in the target directory.
+```
+
+On a mapped or network drive (this checkout lives on `Z:`), Gradle's recursive
+delete fails intermittently and names a **different** directory each retry.
+Nothing is actually holding the files — PowerShell removes the same directory
+without complaint, which is the tell. Stopping the daemon doesn't fix it.
+
+```bash
+./gradlew --stop && rm -rf app/build core/build build
+```
+
+then re-run. If it recurs often enough to be annoying, move the checkout to a
+local disk — the drive is the cause, not the build.
+
 ---
 
 ## 3. Acceptance walkthrough
 
-**This is a bug-finding exercise, not a demo.** Nothing below has ever been
-executed. Expect breakage, and treat each break as the actual work rather than
-an interruption to it.
+**Run in full on a Pixel 5 (Android 14) on 2026-08-04** — the first time any of
+this code had ever executed. All eight steps now pass. It found four real bugs,
+all fixed in the same commit: lost navigation state on rotation, a top bar that
+said "Board" instead of the board's name, shrink-wrapped kanban columns, and an
+off-palette selection colour in the template sheet.
+
+Re-run it after any change to navigation, persistence, or the board screens. It
+is still a bug-finding exercise rather than a demo — treat a failure as the
+work, not as an interruption to it.
 
 Run it on a real device or emulator, top to bottom:
 
@@ -122,6 +148,40 @@ Anything that fails here is worth more than the next feature. Fix it, and add a
 `:core` test if the cause turns out to be logic that could have lived there.
 
 ---
+
+## 3a. The design
+
+The UI is transcribed from a design comp, committed at
+**`design/ProjectMate.dc.html`** so it travels with the code. Open it in a
+browser — it renders 16 screens and 7 sheets with a clickable index, and the
+styles are inline, so the exact value for anything is readable straight off the
+element.
+
+What is already transcribed into
+`app/src/main/kotlin/.../designsystem/Theme.kt`:
+
+| | |
+|---|---|
+| Canvas | `#0B0B0C` |
+| Cards / chips | `#141419`, raised `#1A1A20`, high `#26262E` |
+| Accent | `#FF6B1A` (bright `#FF8A4C`) |
+| Text | `#F2F0EE` → `#93908C` → `#7E7B77` → `#6E6B67` |
+| Blocked | `#E2453C`, label `#FF7A70` |
+| Categories | backlog `#3A3A42` · active accent · blocked red · done `#6F6C68` |
+
+Two deliberate departures from the comp, both worth knowing before you "fix"
+them:
+
+- **Monospace is `FontFamily.Monospace`, not JetBrains Mono.** That resolves to
+  Roboto Mono on Android and needs no font binary in the APK. Swap in the real
+  face if the difference ever matters.
+- **The smart-view chips on the Boards home** (Today / Inbox / Overdue with
+  counts) are in the comp but not built — they need cross-board queries that
+  belong with the Today screen.
+
+Screens 6 onward in the comp — item detail, list and agenda views, the status
+editor, settings — have no implementation yet. The comp is the target; check it
+before designing anything new.
 
 ## 4. Working on it locally
 
@@ -158,22 +218,24 @@ and do not trust a screen you have only compiled.
 Work on the branch claude/android-project-tracker-bizgrj. Do not push to main
 without being asked.
 
-FIRST TASK: run the acceptance walkthrough in docs/LOCAL_SETUP.md section 3 on
-a real device or emulator, and fix what breaks. Nothing in it has ever run, so
-treat failures as the expected outcome and the actual work. This will find more
-real problems than adding another screen.
+THE UI FOLLOWS A DESIGN COMP, committed at design/ProjectMate.dc.html. Open it
+in a browser — 16 screens and 7 sheets, clickable index, inline styles you can
+read exact values from. The theme, Boards home and kanban are
+already transcribed; everything from screen 6 on is not built. Read section 3a
+of docs/LOCAL_SETUP.md, and check the comp before designing anything new.
 
-THEN, in this order, per docs/SITEMAP.md: item detail (notes, priority, due
-date, tags, checklist) → Today (the cross-board attention view, and the screen
-the app is judged on) → Inbox plus the share-target and file-import paths.
+FIRST TASK, in this order, per docs/SITEMAP.md: item detail (notes, priority,
+due date, tags, checklist) → Today (the cross-board attention view, and the
+screen the app is judged on) → Inbox plus the share-target and file-import
+paths. Build each to match the comp.
 
-VERIFY EARLY — an unverified claim is load-bearing right now. DECISIONS.md
-D-011 justifies choosing Room 3 with BundledSQLiteDriver on the grounds that
-DAO and migration tests run as ordinary JVM unit tests, no emulator and no
-Robolectric. Nothing has ever exercised that. The in-memory database builder
-may well want a Context, which would break the claim. Write one real DAO test
-and find out. If it does not hold, correct D-011 rather than leaving a
-justification standing that was never tested.
+RUN THE APP, DON'T JUST COMPILE IT. The acceptance walkthrough in section 3 of
+docs/LOCAL_SETUP.md passes as of 2026-08-04, and running it is what found the
+four bugs fixed that day — rotation losing the back stack, a top bar showing
+"Board" instead of the board name, shrink-wrapped columns, an off-palette
+selection. Re-run it after touching navigation, persistence or the board
+screens. `adb` drives it fine: `adb shell input tap x y` plus
+`adb exec-out screencap` is enough to walk the whole thing.
 
 TWO OPEN PRODUCT QUESTIONS, both yours to raise rather than silently decide:
 - Seeding. First run currently creates only the system Inbox; starter Projects
@@ -184,8 +246,8 @@ TWO OPEN PRODUCT QUESTIONS, both yours to raise rather than silently decide:
   than a data change — but it is not scheduled.
 
 WORKING HABIT THAT EARNED ITS KEEP: when a build fails, read the literal error
-text before forming a theory about it. Two confident wrong diagnoses each cost
-a full CI round-trip, and both times the error text had already named the
-cause. This matters less now that builds are fast, but the habit is still what
-gets you there first.
+text before forming a theory about it. It has named the cause every time so
+far — "no sqliteJni in java.library.path" was a missing JVM native artifact,
+not a Room problem; "expected Saver<T, List<String>>, actual Saver<T, Any>" was
+listSaver's real return type. Guessing costs more than reading.
 ```

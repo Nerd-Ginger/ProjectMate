@@ -121,10 +121,17 @@ private fun TemplateCard(
     Card(
         modifier = Modifier.clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
+            // Selection reads as the accent, not as a second hue — the palette
+            // has one highlight colour and this is it.
             containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.secondaryContainer
+                MaterialTheme.colorScheme.primaryContainer
             } else {
                 MaterialTheme.colorScheme.surfaceContainerHigh
+            },
+            contentColor = if (isSelected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurface
             },
         ),
     ) {
@@ -181,7 +188,7 @@ private fun StatusPreview(template: BoardTemplate) {
 @Preview(showBackground = true, widthDp = 380)
 @Composable
 private fun StatusPreviewPreview() {
-    ProjectMateTheme(dynamicColor = false) {
+    ProjectMateTheme() {
         Column(Modifier.padding(20.dp)) {
             StatusPreview(BoardTemplates.Projects)
         }

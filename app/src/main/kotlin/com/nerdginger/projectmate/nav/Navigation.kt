@@ -3,7 +3,9 @@ package com.nerdginger.projectmate.nav
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
 /**
@@ -59,12 +61,25 @@ sealed interface Screen {
 @Stable
 class Navigator(
     initial: Screen.TopLevel = Screen.Boards,
+    restoredStacks: Map<Screen.TopLevel, List<Screen>>? = null,
+    restoredTabHistory: List<Screen.TopLevel>? = null,
 ) {
     private val stacks: Map<Screen.TopLevel, SnapshotStateList<Screen>> = TOP_LEVEL.associateWith {
-        mutableStateListOf<Screen>(it)
+        tab ->
+        val restored = restoredStacks?.get(tab)
+        if (restored.isNullOrEmpty()) {
+            mutableStateListOf<Screen>(tab)
+        } else {
+            mutableStateListOf<Screen>().apply { addAll(restored) }
+        }
     }
 
-    private val tabHistory: SnapshotStateList<Screen.TopLevel> = mutableStateListOf(initial)
+    private val tabHistory: SnapshotStateList<Screen.TopLevel> =
+        if (restoredTabHistory.isNullOrEmpty()) {
+            mutableStateListOf(initial)
+        } else {
+            mutableStateListOf<Screen.TopLevel>().apply { addAll(restoredTabHistory) }
+        }
 
     /** The tab currently shown. */
     val currentTab: Screen.TopLevel get() = tabHistory.last()
@@ -121,12 +136,117 @@ class Navigator(
         tabHistory.add(tab)
     }
 
+    /** Snapshot of every tab's stack, for [NavigatorSaver]. */
+    internal fun snapshot(): Pair<Map<Screen.TopLevel, List<Screen>>, List<Screen.TopLevel>> =
+        stacks.mapValues { (_, stack) -> stack.toList() } to tabHistory.toList()
+
     companion object {
         val TOP_LEVEL: List<Screen.TopLevel> =
             listOf(Screen.Boards, Screen.Today, Screen.Inbox, Screen.Search)
     }
 }
 
+// ------------------------------------------------------------------ saving
+
+private fun Screen.encode(): String = when (this) {
+    is Screen.Boards -> "boards"
+    is Screen.Today -> "today"
+    is Screen.Inbox -> "inbox"
+    is Screen.Search -> "search"
+    is Screen.TagManager -> "tags"
+    is Screen.Archive -> "archive"
+    is Screen.Settings -> "settings"
+    is Screen.BoardDetail -> "board:$boardId"
+    is Screen.ItemDetail -> "item:$itemId"
+    is Screen.StatusEditor -> "statuses:$boardId"
+    is Screen.BoardSettings -> "boardSettings:$boardId"
+    is Screen.SavedView -> "view:$viewId"
+    // Deliberately not restored — see the note on NavigatorSaver.
+    is Screen.ImportPreview -> "boards"
+}
+
+private fun decodeScreen(value: String): Screen {
+    val type = value.substringBefore(':')
+    val arg = value.substringAfter(':', "")
+    return when (type) {
+        "today" -> Screen.Today
+        "inbox" -> Screen.Inbox
+        "search" -> Screen.Search
+        "tags" -> Screen.TagManager
+        "archive" -> Screen.Archive
+        "settings" -> Screen.Settings
+        "board" -> Screen.BoardDetail(arg)
+        "item" -> Screen.ItemDetail(arg)
+        "statuses" -> Screen.StatusEditor(arg)
+        "boardSettings" -> Screen.BoardSettings(arg)
+        "view" -> Screen.SavedView(arg)
+        else -> Screen.Boards
+    }
+}
+
+private fun decodeTab(value: String): Screen.TopLevel = when (value) {
+    "today" -> Screen.Today
+    "inbox" -> Screen.Inbox
+    "search" -> Screen.Search
+    else -> Screen.Boards
+}
+
+/**
+ * Persists the back stack across configuration changes and process death.
+ *
+ * Without this a rotation silently returns you to the Boards tab from whatever
+ * you were looking at, which reads as the app losing your place — because it
+ * is. Verified on a device, not assumed.
+ *
+ * Encoded as a flat list of strings: the tab history, then each tab's stack
+ * preceded by its length. Screens carry at most one string argument, so
+ * `type:arg` split on the first colon round-trips ids containing anything.
+ *
+ * **[Screen.ImportPreview] is not restored** — it degrades to the Boards root.
+ * Its argument is a whole JSON payload, and resurrecting a half-confirmed
+ * import after process death is worse than making the user pick the file again.
+ */
+private val NavigatorSaver: Saver<Navigator, Any> = listSaver<Navigator, String>(
+    save = { navigator ->
+        val (stacks, tabHistory) = navigator.snapshot()
+        buildList {
+            add(tabHistory.joinToString(",") { it.encode() })
+            Navigator.TOP_LEVEL.forEach { tab ->
+                val stack = stacks[tab].orEmpty()
+                add(stack.size.toString())
+                stack.forEach { add(it.encode()) }
+            }
+        }
+    },
+    restore = { saved ->
+        val tabHistory = saved.first()
+            .split(",")
+            .filter { it.isNotBlank() }
+            .map(::decodeTab)
+
+        val stacks = mutableMapOf<Screen.TopLevel, List<Screen>>()
+        var cursor = 1
+        Navigator.TOP_LEVEL.forEach { tab ->
+            if (cursor >= saved.size) return@forEach
+            val size = saved[cursor].toIntOrNull() ?: 0
+            cursor++
+            val screens = mutableListOf<Screen>()
+            repeat(size) {
+                if (cursor < saved.size) {
+                    screens.add(decodeScreen(saved[cursor]))
+                    cursor++
+                }
+            }
+            stacks[tab] = screens
+        }
+
+        Navigator(
+            restoredStacks = stacks,
+            restoredTabHistory = tabHistory,
+        )
+    },
+)
+
 @Composable
 fun rememberNavigator(initial: Screen.TopLevel = Screen.Boards): Navigator =
-    remember { Navigator(initial) }
+    rememberSaveable(saver = NavigatorSaver) { Navigator(initial) }

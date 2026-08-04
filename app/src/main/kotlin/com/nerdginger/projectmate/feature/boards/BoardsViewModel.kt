@@ -28,6 +28,9 @@ data class BoardsUiState(
 ) {
     /** True once loading has finished and there is genuinely nothing to show. */
     val isEmpty: Boolean get() = !isLoading && pinned.isEmpty() && others.isEmpty()
+
+    /** Every board, pinned or not — for looking one up by id. */
+    val allBoards: List<BoardSummary> get() = pinned + others
 }
 
 class BoardsViewModel(

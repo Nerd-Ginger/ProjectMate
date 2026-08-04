@@ -36,7 +36,7 @@ The goal: an app that is genuinely usable every day with no server involved.
 
 ### Interface
 
-- ✅ Material 3 theme, dark mode, navigation shell
+- ✅ Design-system theme — the black-and-orange comp, navigation shell
 - ✅ **Boards** — collection cards with progress
 - ✅ Create collection from template
 - ✅ **Board view** — kanban columns, move and advance status

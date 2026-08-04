@@ -7,6 +7,19 @@ Anything a user would notice gets a line here, in the same commit that ships it.
 
 ## [Unreleased]
 
+### Changed
+- **The app now looks like its design**: a fixed near-black theme with a hot
+  orange accent, replacing the Material You wallpaper colours it had been
+  picking up. Monospace metadata, monogram board tiles, hairline section rules
+  and a segmented progress bar with a per-category legend
+
+### Fixed
+- Rotating the device no longer throws away the back stack — the app stayed
+  open on the right screen instead of jumping back to the Boards root
+- A board's own name is shown when you open it, rather than the word "Board"
+- Kanban columns fill the screen height, so the add-item field sits at the
+  bottom of a column instead of the card shrink-wrapping around its contents
+
 ### Added
 - Feature-request import: reads the JSON contract the website will serve, with
   per-request error reporting so one bad entry never loses the rest of a batch,

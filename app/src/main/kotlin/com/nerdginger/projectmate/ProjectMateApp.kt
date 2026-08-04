@@ -1,16 +1,22 @@
 package com.nerdginger.projectmate
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -19,11 +25,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nerdginger.projectmate.designsystem.LocalProjectMateTokens
 import com.nerdginger.projectmate.di.AppContainer
 import com.nerdginger.projectmate.feature.board.BoardDetailScreen
 import com.nerdginger.projectmate.feature.board.BoardDetailViewModel
@@ -78,39 +85,56 @@ fun ProjectMateApp(container: AppContainer) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
+        // A board's own name, not the generic "Board" its Screen carries. The
+        // summaries are already loaded here, so no extra query is needed to
+        // answer "which board am I looking at?".
         topBar = {
-            TopAppBar(
-                title = { Text(navigator.current.title()) },
-                navigationIcon = {
-                    // Only when there is somewhere to go back to within this
-                    // tab; a back arrow that exits the app is a trap.
-                    if (navigator.current !is Screen.TopLevel) {
-                        IconButton(onClick = { navigator.pop() }) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
-                            )
-                        }
-                    }
+            val screen = navigator.current
+            ProjectMateTopBar(
+                navigator = navigator,
+                title = when (screen) {
+                    is Screen.BoardDetail ->
+                        boardsState.allBoards
+                            .firstOrNull { it.board.id == screen.boardId }
+                            ?.board?.name
+                            ?: screen.title()
+
+                    else -> screen.title()
                 },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                tonalElevation = 0.dp,
+            ) {
                 Navigator.TOP_LEVEL.forEach { destination ->
                     NavigationBarItem(
                         selected = navigator.currentTab == destination,
                         onClick = { navigator.selectTab(destination) },
                         icon = { Icon(destination.icon(), contentDescription = null) },
                         label = { Text(destination.title()) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     )
                 }
             }
         },
         floatingActionButton = {
             if (navigator.current is Screen.Boards) {
-                FloatingActionButton(onClick = { showTemplateSheet = true }) {
+                FloatingActionButton(
+                    onClick = { showTemplateSheet = true },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    shape = RoundedCornerShape(19.dp),
+                ) {
                     Icon(Icons.Default.Add, contentDescription = "New board")
                 }
             }
@@ -145,6 +169,66 @@ fun ProjectMateApp(container: AppContainer) {
                     showTemplateSheet = false
                 },
             )
+        }
+    }
+}
+
+/**
+ * Two headers in one, because the comp uses two.
+ *
+ * A top-level destination gets the wordmark eyebrow above a large title — the
+ * app announcing itself. A pushed screen gets a compact row with a back arrow,
+ * because by then you know what app you're in and the vertical space is better
+ * spent on content.
+ */
+@Composable
+private fun ProjectMateTopBar(navigator: Navigator, title: String) {
+    val tokens = LocalProjectMateTokens.current
+    val screen = navigator.current
+    val atTopLevel = screen is Screen.TopLevel
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding()
+            .padding(start = 20.dp, end = 8.dp, top = if (atTopLevel) 14.dp else 6.dp, bottom = 10.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (!atTopLevel) {
+                IconButton(onClick = { navigator.pop() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
+            }
+
+            Column(Modifier.weight(1f)) {
+                if (atTopLevel) {
+                    Text(
+                        text = "ProjectMate".uppercase(),
+                        style = tokens.sectionLabel.copy(
+                            color = MaterialTheme.colorScheme.primary,
+                        ),
+                        modifier = Modifier.padding(bottom = 3.dp),
+                    )
+                }
+                Text(
+                    text = title,
+                    style = if (atTopLevel) {
+                        MaterialTheme.typography.headlineSmall
+                    } else {
+                        MaterialTheme.typography.titleMedium
+                    },
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+
+            IconButton(onClick = { /* Overflow menu — docs/SITEMAP.md, not built yet. */ }) {
+                Icon(
+                    Icons.Default.MoreVert,
+                    contentDescription = "More",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
     }
 }

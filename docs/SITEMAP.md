@@ -2,15 +2,18 @@
 
 Every view in ProjectMate, what it's for, and what it contains.
 
-**Status: mostly specification.** The navigation shell and the Boards home
-screen exist; every other view is a named placeholder in the app, so a build on
-a phone shows exactly how far things have got.
+**Status: mostly specification.** The navigation shell, the Boards home and the
+kanban board exist and have been run on a device; every other view is a named
+placeholder in the app, so a build on a phone shows exactly how far things have
+got.
 
-This document is the design target — it defines what gets built, and it's the
-reference for anyone designing the UI. Views are marked ⬜ planned / 🚧 building
-/ ✅ shipped and updated as they land.
+This document is the design target — it defines what gets built. The **visual**
+reference is the comp at `design/ProjectMate.dc.html`, which renders every
+screen listed here; this file says what a screen contains, the comp says what it
+looks like. Views are marked ⬜ planned / 🚧 building / ✅ shipped and updated as
+they land.
 
-Last updated: 2026-08-03
+Last updated: 2026-08-04
 
 ---
 

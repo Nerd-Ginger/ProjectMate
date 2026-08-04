@@ -115,11 +115,12 @@ dependencies {
     // Room 3 runs on the JVM via the bundled SQLite driver, so DAO and
     // migration tests are plain unit tests — no emulator required.
     testImplementation(libs.kotlin.test)
+    testImplementation(libs.kotlin.test.junit5)
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.room.testing)
-    testImplementation(libs.sqlite.bundled)
+    testImplementation(libs.sqlite.bundled.jvm)
     testImplementation(libs.turbine)
 }
 
