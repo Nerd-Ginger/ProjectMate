@@ -39,6 +39,7 @@ import com.nerdginger.projectmate.core.model.SyncMeta
 import com.nerdginger.projectmate.data.repository.BoardSummary
 import com.nerdginger.projectmate.designsystem.LocalProjectMateTokens
 import com.nerdginger.projectmate.designsystem.ProjectMateTheme
+import com.nerdginger.projectmate.designsystem.component.BoardAvatar
 import com.nerdginger.projectmate.designsystem.component.BoardProgressBar
 import com.nerdginger.projectmate.designsystem.component.BoardProgressLegend
 
@@ -162,41 +163,6 @@ private fun BoardCard(
             BoardProgressBar(progress, Modifier.padding(top = 13.dp))
             BoardProgressLegend(progress, Modifier.padding(top = 9.dp))
         }
-    }
-}
-
-/**
- * Two-letter monogram on a tinted square, in the board's accent.
- *
- * The comp uses these rather than the emoji the data model carries — they stay
- * legible at 34dp and give every board the same visual weight.
- */
-@Composable
-private fun BoardAvatar(name: String, accent: Color) {
-    Box(
-        modifier = Modifier
-            .size(34.dp)
-            .clip(RoundedCornerShape(9.dp))
-            .background(accent.copy(alpha = 0.16f)),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = monogram(name),
-            color = accent,
-            fontFamily = FontFamily.Monospace,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.5.sp,
-        )
-    }
-}
-
-/** First letters of the first two words, else the first two characters. */
-private fun monogram(name: String): String {
-    val words = name.trim().split(" ").filter { it.isNotBlank() }
-    return when {
-        words.size >= 2 -> "${words[0].first()}${words[1].first()}".uppercase()
-        else -> name.trim().take(2).uppercase()
     }
 }
 

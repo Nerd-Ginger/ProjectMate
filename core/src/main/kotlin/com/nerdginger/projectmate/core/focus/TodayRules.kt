@@ -26,6 +26,19 @@ data class FocusEntry(
 )
 
 /**
+ * One headed group of rows — "Overdue 2", "Due today 1", "In focus 3".
+ *
+ * A section only exists when it has rows. An empty "Overdue" heading would
+ * imply something is wrong when nothing is.
+ */
+data class FocusSection(
+    val reason: FocusReason,
+    val entries: List<FocusEntry>,
+) {
+    val count: Int get() = entries.size
+}
+
+/**
  * Decides what belongs on the Today screen.
  *
  * Today is the screen the whole app is judged on: it is the one honest answer
@@ -70,6 +83,28 @@ object TodayRules {
             }
             .sortedWith(ordering)
             .toList()
+
+    /**
+     * The same rows, grouped under their reason for display.
+     *
+     * Convenience over [today] rather than a second set of rules — it groups
+     * whatever it is given and decides nothing. Sections come out in
+     * [FocusReason] order because [today] already sorted by it, and empty ones
+     * are dropped.
+     */
+    fun sections(
+        items: List<Item>,
+        statusesById: Map<String, Status>,
+        now: Instant,
+        zone: ZoneId,
+    ): List<FocusSection> = group(today(items, statusesById, now, zone))
+
+    /** Groups an already-computed list. Split out so it can be tested directly. */
+    fun group(entries: List<FocusEntry>): List<FocusSection> =
+        FocusReason.entries.mapNotNull { reason ->
+            val rows = entries.filter { it.reason == reason }
+            if (rows.isEmpty()) null else FocusSection(reason, rows)
+        }
 
     /**
      * Overdue first, then due today, then focus work. Within a group, more

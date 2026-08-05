@@ -21,6 +21,10 @@ Anything a user would notice gets a line here, in the same commit that ships it.
   bottom of a column instead of the card shrink-wrapping around its contents
 
 ### Added
+- **Today** — one screen answering "what needs me now?" across every board.
+  Overdue first, then due today, then anything sitting in a status you've marked
+  as focus. Each row shows which board it came from, its status and how late it
+  is. Sections with nothing in them don't appear at all
 - Feature-request import: reads the JSON contract the website will serve, with
   per-request error reporting so one bad entry never loses the rest of a batch,
   and deduplication so re-importing the same export changes nothing

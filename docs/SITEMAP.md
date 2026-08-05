@@ -2,10 +2,10 @@
 
 Every view in ProjectMate, what it's for, and what it contains.
 
-**Status: mostly specification.** The navigation shell, the Boards home and the
-kanban board exist and have been run on a device; every other view is a named
-placeholder in the app, so a build on a phone shows exactly how far things have
-got.
+**Status: mostly specification.** The navigation shell, the Boards home, the
+kanban board and Today exist and have been run on a device; every other view is
+a named placeholder in the app, so a build on a phone shows exactly how far
+things have got.
 
 This document is the design target — it defines what gets built. The **visual**
 reference is the comp at `design/ProjectMate.dc.html`, which renders every
@@ -62,7 +62,7 @@ The collections list. Answers "what am I tracking?"
 **Design note:** the progress bar segments are `Backlog / Active / Blocked /
 Done` — four colours, not a percentage. Blocked needs to be visible at a glance.
 
-### 2. Today ⬜
+### 2. Today ✅
 
 The screen the app is judged on. One honest answer to "what now?", pulled
 across every board.
@@ -73,9 +73,15 @@ across every board.
 | **Due today** | Due today, not yet passed |
 | **In focus** | Sitting in a status marked as focus — work with no due date |
 
-Rows carry their board's emoji and accent colour, so a work project and a
+Rows carry their board's monogram in its accent colour, so a work project and a
 household errand are distinguishable at a glance. Terminal statuses never
 appear, however overdue.
+
+**Built as:** a monogram badge, the title, a status pill and a due chip, with an
+orange dot for urgent items only. Section headings carry their own count and
+disappear entirely when empty — an empty "Overdue" heading would imply something
+is wrong when nothing is. Every rule lives in `TodayRules` in `:core`; the screen
+only draws the answer.
 
 **Empty state:** matters more than usual — "nothing needs you today" should feel
 earned, not broken.

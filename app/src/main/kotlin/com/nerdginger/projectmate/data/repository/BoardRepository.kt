@@ -54,6 +54,30 @@ class BoardRepository(
         boardDao.observeArchived().map { list -> list.map { it.toDomain() } }
 
     /**
+     * Every live board keyed by id.
+     *
+     * The cross-board screens — Today, Search, Inbox — show which board a row
+     * came from, and they hold items rather than boards. This is the lookup
+     * that turns an item's `boardId` into a name, an accent and a monogram.
+     */
+    fun observeBoardsById(): Flow<Map<String, Board>> =
+        boardDao.observeActive().map { list ->
+            list.associate { entity -> entity.id to entity.toDomain() }
+        }
+
+    /**
+     * Every status on every board, keyed by id.
+     *
+     * [com.nerdginger.projectmate.core.focus.TodayRules] needs this: it reads a
+     * status's category and focus flag to decide what is pressing, and it works
+     * across boards, so a per-board query would not do.
+     */
+    fun observeStatusesById(): Flow<Map<String, Status>> =
+        statusDao.observeAll().map { list ->
+            list.associate { entity -> entity.id to entity.toDomain() }
+        }
+
+    /**
      * A board with its columns.
      *
      * Composed from two flows rather than a Room `@Relation` — see the note in

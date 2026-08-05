@@ -128,4 +128,65 @@ class TodayRulesTest {
 
         assertEquals(setOf("projects", "life"), result.map { it.item.boardId }.toSet())
     }
+
+    // ------------------------------------------------------------- sections
+
+    private fun sections(vararg items: com.nerdginger.projectmate.core.model.Item) =
+        TodayRules.sections(items.toList(), statuses, now, zone)
+
+    @Test
+    fun `sections come out in reading order, most pressing first`() {
+        val overdue = Fixtures.item("overdue", active.id, dueAt = allDay("2026-08-01"))
+        val dueToday = Fixtures.item("dueToday", active.id, dueAt = allDay("2026-08-04"))
+        val inFocus = Fixtures.item("inFocus", building.id)
+
+        val result = sections(inFocus, dueToday, overdue)
+
+        assertEquals(
+            listOf(FocusReason.OVERDUE, FocusReason.DUE_TODAY, FocusReason.IN_FOCUS_STATUS),
+            result.map { it.reason },
+        )
+    }
+
+    @Test
+    fun `a section with nothing in it is not shown at all`() {
+        // An empty "Overdue" heading implies something is wrong when nothing is.
+        val inFocus = Fixtures.item("inFocus", building.id)
+
+        val result = sections(inFocus)
+
+        assertEquals(listOf(FocusReason.IN_FOCUS_STATUS), result.map { it.reason })
+    }
+
+    @Test
+    fun `nothing to do produces no sections rather than empty ones`() {
+        assertTrue(sections().isEmpty())
+    }
+
+    @Test
+    fun `each section counts its own rows`() {
+        val a = Fixtures.item("a", active.id, dueAt = allDay("2026-08-01"))
+        val b = Fixtures.item("b", active.id, dueAt = allDay("2026-07-30"))
+        val c = Fixtures.item("c", building.id)
+
+        val result = sections(a, b, c)
+
+        assertEquals(2, result.first { it.reason == FocusReason.OVERDUE }.count)
+        assertEquals(1, result.first { it.reason == FocusReason.IN_FOCUS_STATUS }.count)
+    }
+
+    @Test
+    fun `grouping keeps the order within a section`() {
+        val urgent = Fixtures.item(
+            "urgent",
+            active.id,
+            dueAt = allDay("2026-08-01"),
+            priority = Priority.URGENT,
+        )
+        val normal = Fixtures.item("normal", active.id, dueAt = allDay("2026-08-01"))
+
+        val overdue = sections(normal, urgent).single { it.reason == FocusReason.OVERDUE }
+
+        assertEquals(listOf("urgent", "normal"), overdue.entries.map { it.item.id })
+    }
 }

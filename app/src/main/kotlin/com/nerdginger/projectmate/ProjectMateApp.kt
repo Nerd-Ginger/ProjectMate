@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nerdginger.projectmate.designsystem.LocalProjectMateTokens
@@ -50,9 +51,13 @@ import com.nerdginger.projectmate.feature.board.BoardDetailViewModel
 import com.nerdginger.projectmate.feature.boards.BoardTemplateSheet
 import com.nerdginger.projectmate.feature.boards.BoardsScreen
 import com.nerdginger.projectmate.feature.boards.BoardsViewModel
+import com.nerdginger.projectmate.feature.today.TodayScreen
+import com.nerdginger.projectmate.feature.today.TodayViewModel
+import com.nerdginger.projectmate.feature.today.todayEyebrow
 import com.nerdginger.projectmate.nav.Navigator
 import com.nerdginger.projectmate.nav.Screen
 import com.nerdginger.projectmate.nav.rememberNavigator
+import java.time.LocalDate
 
 /**
  * The app shell: bottom bar, back handling, and whichever screen is current.
@@ -154,6 +159,12 @@ fun ProjectMateApp(container: AppContainer) {
                 contentPadding = insets,
             )
 
+            is Screen.Today -> Today(
+                container = container,
+                onOpenItem = { navigator.push(Screen.ItemDetail(it)) },
+                contentPadding = insets,
+            )
+
             else -> ComingSoon(
                 label = screen.title(),
                 modifier = Modifier.padding(insets),
@@ -171,6 +182,29 @@ fun ProjectMateApp(container: AppContainer) {
             )
         }
     }
+}
+
+/**
+ * Hosts the Today screen.
+ *
+ * Its own ViewModel rather than the app-level one: Today watches every item on
+ * every board, and there is no reason to keep that running while you're looking
+ * at a single board.
+ */
+@Composable
+private fun Today(
+    container: AppContainer,
+    onOpenItem: (String) -> Unit,
+    contentPadding: androidx.compose.foundation.layout.PaddingValues,
+) {
+    val viewModel: TodayViewModel = viewModel(factory = TodayViewModel.factory(container))
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    TodayScreen(
+        state = state,
+        onOpenItem = onOpenItem,
+        contentPadding = contentPadding,
+    )
 }
 
 /**
@@ -203,9 +237,18 @@ private fun ProjectMateTopBar(navigator: Navigator, title: String) {
 
             Column(Modifier.weight(1f)) {
                 if (atTopLevel) {
+                    // The wordmark, except on Today, where the comp spends the
+                    // eyebrow on today's date instead — more useful than the
+                    // name of the app you are already looking at.
+                    val eyebrow = when (screen) {
+                        is Screen.Today -> todayEyebrow(LocalDate.now())
+                        else -> "ProjectMate"
+                    }
                     Text(
-                        text = "ProjectMate".uppercase(),
+                        text = eyebrow.uppercase(),
                         style = tokens.sectionLabel.copy(
+                            fontSize = 10.sp,
+                            letterSpacing = 1.8.sp,
                             color = MaterialTheme.colorScheme.primary,
                         ),
                         modifier = Modifier.padding(bottom = 3.dp),
