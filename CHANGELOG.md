@@ -21,6 +21,9 @@ Anything a user would notice gets a line here, in the same commit that ships it.
   bottom of a column instead of the card shrink-wrapping around its contents
 
 ### Added
+- **Item detail** — open anything from a board or from Today and edit it in
+  place: title, notes, priority, status, due date, tags and a checklist with a
+  progress bar. Everything saves as you go; there is no save button
 - **Today** — one screen answering "what needs me now?" across every board.
   Overdue first, then due today, then anything sitting in a status you've marked
   as focus. Each row shows which board it came from, its status and how late it

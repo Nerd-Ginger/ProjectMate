@@ -41,7 +41,7 @@ The goal: an app that is genuinely usable every day with no server involved.
 - ✅ Create collection from template
 - ✅ **Board view** — kanban columns, move and advance status
 - ⬜ **List view** — grouped by status or due date
-- ⬜ **Item detail** — notes, priority, due date, tags, checklist
+- ✅ **Item detail** — notes, priority, due date, tags, checklist
 - ✅ **Today** — cross-board attention view
 - ⬜ **Inbox** — capture and triage
 - ⬜ **Search** across all items

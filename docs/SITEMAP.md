@@ -2,10 +2,15 @@
 
 Every view in ProjectMate, what it's for, and what it contains.
 
-**Status: mostly specification.** The navigation shell, the Boards home, the
-kanban board and Today exist and have been run on a device; every other view is
-a named placeholder in the app, so a build on a phone shows exactly how far
-things have got.
+**Status: half built.** The navigation shell, the Boards home, the kanban board,
+Today and Item detail exist and have been run on a device; every other view is a
+named placeholder in the app, so a build on a phone shows exactly how far things
+have got.
+
+One departure worth knowing: **the bottom bar stays visible on pushed screens.**
+The comp hides it on Item detail and the Status editor. Keeping the tabs
+reachable everywhere is the friendlier behaviour and costs nothing, so it stands
+unless it starts to feel wrong on a device.
 
 This document is the design target — it defines what gets built. The **visual**
 reference is the comp at `design/ProjectMate.dc.html`, which renders every
@@ -140,7 +145,7 @@ priority, or tag). Swipe to complete or archive.
 Date-bucketed: Overdue · Today · Tomorrow · This week · Later · No date. The
 right view for a Life board.
 
-### 8. Item detail ⬜
+### 8. Item detail ✅
 
 | Contains | Notes |
 |---|---|
@@ -156,6 +161,19 @@ right view for a Life board.
 | **Feature-request card** | Only for feature requests: requester, votes, submitted date, portal link, "convert to project task" |
 
 **Autosave on every field change. No Save button, no destructive back.**
+
+**Built, with three gaps:**
+- **Linked items** is absent. The DAO and repository can read and remove links,
+  but nothing can create one yet, so the section could only ever render empty.
+- **Due dates are all-day only.** The comp shows `Today 17:00`; Material's date
+  picker is date-only, and a time picker is a second sheet. `dueHasTime` is
+  wired end to end and `DueDates` already distinguishes the two, so this is a
+  UI gap rather than a model one.
+- The feature-request card shows votes, requester and date, but not the
+  **Convert to project task** or **Portal ↗** actions — both need phase 2.
+
+Text commits on focus loss rather than per keystroke, so a half-typed title
+never becomes the item's real title on other screens.
 
 ---
 

@@ -4,6 +4,7 @@ import android.content.Context
 import com.nerdginger.projectmate.data.DatabaseSeeder
 import com.nerdginger.projectmate.data.ProjectMateDatabase
 import com.nerdginger.projectmate.data.repository.BoardRepository
+import com.nerdginger.projectmate.data.repository.ItemDetailRepository
 import com.nerdginger.projectmate.data.repository.ItemRepository
 
 /**
@@ -38,5 +39,9 @@ class AppContainer(context: Context) {
 
     val itemRepository: ItemRepository by lazy {
         ItemRepository(itemDao, statusDao)
+    }
+
+    val itemDetailRepository: ItemDetailRepository by lazy {
+        ItemDetailRepository(checklistDao, tagDao, itemLinkDao, featureRequestMetaDao)
     }
 }

@@ -3,18 +3,27 @@ package com.nerdginger.projectmate.data.mapper
 import com.nerdginger.projectmate.core.model.Board
 import com.nerdginger.projectmate.core.model.BoardProgress
 import com.nerdginger.projectmate.core.model.BoardType
+import com.nerdginger.projectmate.core.model.ChecklistEntry
+import com.nerdginger.projectmate.core.model.FeatureRequestMeta
 import com.nerdginger.projectmate.core.model.GroupBy
 import com.nerdginger.projectmate.core.model.Item
+import com.nerdginger.projectmate.core.model.ItemLink
 import com.nerdginger.projectmate.core.model.ItemType
+import com.nerdginger.projectmate.core.model.LinkRelation
 import com.nerdginger.projectmate.core.model.Priority
 import com.nerdginger.projectmate.core.model.Status
 import com.nerdginger.projectmate.core.model.StatusCategory
+import com.nerdginger.projectmate.core.model.Tag
 import com.nerdginger.projectmate.core.model.ViewMode
 import com.nerdginger.projectmate.data.dao.BoardCategoryCount
 import com.nerdginger.projectmate.data.entity.BoardEntity
+import com.nerdginger.projectmate.data.entity.ChecklistEntryEntity
+import com.nerdginger.projectmate.data.entity.FeatureRequestMetaEntity
 import com.nerdginger.projectmate.data.entity.ItemEntity
+import com.nerdginger.projectmate.data.entity.ItemLinkEntity
 import com.nerdginger.projectmate.data.entity.StatusEntity
 import com.nerdginger.projectmate.data.entity.SyncColumns
+import com.nerdginger.projectmate.data.entity.TagEntity
 
 /**
  * Entity ↔ domain conversion.
@@ -128,6 +137,69 @@ fun Item.toEntity(): ItemEntity = ItemEntity(
     isPinned = isPinned,
     archivedAt = archivedAt,
     sync = SyncColumns.from(sync),
+)
+
+fun ChecklistEntryEntity.toDomain(): ChecklistEntry = ChecklistEntry(
+    id = id,
+    itemId = itemId,
+    text = text,
+    isDone = isDone,
+    doneAt = doneAt,
+    sortKey = sortKey,
+    sync = sync.toDomain(),
+)
+
+fun ChecklistEntry.toEntity(): ChecklistEntryEntity = ChecklistEntryEntity(
+    id = id,
+    itemId = itemId,
+    text = text,
+    isDone = isDone,
+    doneAt = doneAt,
+    sortKey = sortKey,
+    sync = SyncColumns.from(sync),
+)
+
+fun TagEntity.toDomain(): Tag = Tag(
+    id = id,
+    name = name,
+    colorArgb = colorArgb,
+    sync = sync.toDomain(),
+)
+
+fun Tag.toEntity(): TagEntity = TagEntity(
+    id = id,
+    name = name,
+    colorArgb = colorArgb,
+    sync = SyncColumns.from(sync),
+)
+
+fun ItemLinkEntity.toDomain(): ItemLink = ItemLink(
+    id = id,
+    fromItemId = fromItemId,
+    toItemId = toItemId,
+    relation = LinkRelation.fromId(relation),
+    sync = sync.toDomain(),
+)
+
+fun ItemLink.toEntity(): ItemLinkEntity = ItemLinkEntity(
+    id = id,
+    fromItemId = fromItemId,
+    toItemId = toItemId,
+    relation = relation.id,
+    sync = SyncColumns.from(sync),
+)
+
+fun FeatureRequestMetaEntity.toDomain(): FeatureRequestMeta = FeatureRequestMeta(
+    itemId = itemId,
+    requesterName = requesterName,
+    requesterEmail = requesterEmail,
+    contactOptIn = contactOptIn,
+    votes = votes,
+    portalSlug = portalSlug,
+    sourceUrl = sourceUrl,
+    submittedAt = submittedAt,
+    rawPayloadJson = rawPayloadJson,
+    sync = sync.toDomain(),
 )
 
 /** Groups the flat SQL count rows into per-board progress. */

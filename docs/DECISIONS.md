@@ -492,3 +492,27 @@ categories (D-002).
 **Note:** colours are copied into rows at seed time, so **existing boards keep the
 old ones**. Only newly created boards pick these up. Recolouring existing rows
 would mean overwriting a user's own edits, which is worse than the inconsistency.
+
+---
+
+## D-020 — All-day due dates are normalised to the local day, not UTC midnight
+
+**2026-08-04 · Accepted**
+
+The date picker's answer passes through `DueDates.allDayOn(date, localZone)`
+before it is stored, rather than being saved as the picker returns it.
+
+**Why:** Material's `DatePicker` reports the selected day as **midnight UTC**.
+Stored raw and read back in a zone behind UTC, that is the previous day. Found
+on a device in `America/New_York` (UTC−4): picking 1 August saved and displayed
+31 July. It would have looked correct in London and wrong across the Americas.
+
+`DueDates.allDayOn` already existed for exactly this, with a test named "all-day
+normalisation lands on the start of the local day". The bug was not writing the
+helper — it was not calling it.
+
+**Worth remembering:** this class of bug is invisible to the compiler and to any
+test that runs in the same timezone as the developer. It surfaced within a
+minute of running the app on real hardware. `DueDatesTest` already covers the
+timezone dependency ("which day it is depends on the users timezone"); the gap
+was between `:core` and the UI, where nothing was testing.

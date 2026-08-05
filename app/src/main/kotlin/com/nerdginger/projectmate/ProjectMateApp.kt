@@ -51,6 +51,11 @@ import com.nerdginger.projectmate.feature.board.BoardDetailViewModel
 import com.nerdginger.projectmate.feature.boards.BoardTemplateSheet
 import com.nerdginger.projectmate.feature.boards.BoardsScreen
 import com.nerdginger.projectmate.feature.boards.BoardsViewModel
+import com.nerdginger.projectmate.feature.item.DuePickerSheet
+import com.nerdginger.projectmate.feature.item.ItemDetailScreen
+import com.nerdginger.projectmate.feature.item.ItemDetailViewModel
+import com.nerdginger.projectmate.feature.item.StatusPickerSheet
+import com.nerdginger.projectmate.feature.item.TagPickerSheet
 import com.nerdginger.projectmate.feature.today.TodayScreen
 import com.nerdginger.projectmate.feature.today.TodayViewModel
 import com.nerdginger.projectmate.feature.today.todayEyebrow
@@ -81,6 +86,11 @@ fun ProjectMateApp(container: AppContainer) {
     val boardsState by boardsViewModel.uiState.collectAsStateWithLifecycle()
     var showTemplateSheet by remember { mutableStateOf(false) }
 
+    // Item detail knows which board its item is on; the top bar is rendered by
+    // the Scaffold and does not. The screen reports it up rather than the shell
+    // loading the item a second time just to title itself.
+    var detailBoardName by remember { mutableStateOf<String?>(null) }
+
     LaunchedEffect(boardsState.errorMessage) {
         boardsState.errorMessage?.let {
             snackbarHostState.showSnackbar(it)
@@ -104,6 +114,8 @@ fun ProjectMateApp(container: AppContainer) {
                             .firstOrNull { it.board.id == screen.boardId }
                             ?.board?.name
                             ?: screen.title()
+
+                    is Screen.ItemDetail -> detailBoardName ?: screen.title()
 
                     else -> screen.title()
                 },
@@ -165,6 +177,13 @@ fun ProjectMateApp(container: AppContainer) {
                 contentPadding = insets,
             )
 
+            is Screen.ItemDetail -> ItemDetail(
+                container = container,
+                itemId = screen.itemId,
+                onBoardResolved = { detailBoardName = it },
+                contentPadding = insets,
+            )
+
             else -> ComingSoon(
                 label = screen.title(),
                 modifier = Modifier.padding(insets),
@@ -206,6 +225,79 @@ private fun Today(
         contentPadding = contentPadding,
     )
 }
+
+/**
+ * Hosts item detail and its three sheets.
+ *
+ * The sheets live here rather than inside the screen so the screen stays
+ * stateless and previewable — it says "the status chip was tapped", and this
+ * decides that means a sheet.
+ */
+@Composable
+private fun ItemDetail(
+    container: AppContainer,
+    itemId: String,
+    onBoardResolved: (String?) -> Unit,
+    contentPadding: androidx.compose.foundation.layout.PaddingValues,
+) {
+    val viewModel: ItemDetailViewModel = viewModel(
+        key = "item-$itemId",
+        factory = ItemDetailViewModel.factory(container, itemId),
+    )
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(state.board?.name) { onBoardResolved(state.board?.name) }
+
+    var sheet by remember { mutableStateOf<ItemSheet?>(null) }
+
+    ItemDetailScreen(
+        state = state,
+        onTitleChange = viewModel::setTitle,
+        onNotesChange = viewModel::setNotes,
+        onPriorityChange = viewModel::setPriority,
+        onPickStatus = { sheet = ItemSheet.STATUS },
+        onPickDue = { sheet = ItemSheet.DUE },
+        onAddTag = { sheet = ItemSheet.TAGS },
+        onRemoveTag = viewModel::removeTag,
+        onAddChecklistEntry = viewModel::addChecklistEntry,
+        onToggleChecklistEntry = viewModel::setChecklistDone,
+        onDeleteChecklistEntry = viewModel::deleteChecklistEntry,
+        contentPadding = contentPadding,
+    )
+
+    when (sheet) {
+        ItemSheet.STATUS -> StatusPickerSheet(
+            statuses = state.boardStatuses,
+            selectedId = state.status?.id,
+            onDismiss = { sheet = null },
+            onPick = {
+                viewModel.moveTo(it)
+                sheet = null
+            },
+        )
+
+        ItemSheet.DUE -> DuePickerSheet(
+            initialDueAt = state.item?.dueAt,
+            onDismiss = { sheet = null },
+            onPick = { dueAt, hasTime ->
+                viewModel.setDue(dueAt, hasTime)
+                sheet = null
+            },
+        )
+
+        ItemSheet.TAGS -> TagPickerSheet(
+            attached = state.tags,
+            all = state.allTags,
+            onDismiss = { sheet = null },
+            onAdd = viewModel::addTag,
+            onRemove = viewModel::removeTag,
+        )
+
+        null -> Unit
+    }
+}
+
+private enum class ItemSheet { STATUS, DUE, TAGS }
 
 /**
  * Two headers in one, because the comp uses two.
