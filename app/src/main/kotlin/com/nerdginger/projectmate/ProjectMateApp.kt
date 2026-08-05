@@ -61,6 +61,8 @@ import com.nerdginger.projectmate.feature.item.ItemDetailScreen
 import com.nerdginger.projectmate.feature.item.ItemDetailViewModel
 import com.nerdginger.projectmate.feature.item.StatusPickerSheet
 import com.nerdginger.projectmate.feature.item.TagPickerSheet
+import com.nerdginger.projectmate.feature.search.SearchScreen
+import com.nerdginger.projectmate.feature.search.SearchViewModel
 import com.nerdginger.projectmate.feature.today.TodayScreen
 import com.nerdginger.projectmate.feature.today.TodayViewModel
 import com.nerdginger.projectmate.feature.today.todayEyebrow
@@ -191,6 +193,12 @@ fun ProjectMateApp(container: AppContainer) {
 
             is Screen.Inbox -> Inbox(container = container, contentPadding = insets)
 
+            is Screen.Search -> Search(
+                container = container,
+                onOpenItem = { navigator.push(Screen.ItemDetail(it)) },
+                contentPadding = insets,
+            )
+
             else -> ComingSoon(
                 label = screen.title(),
                 modifier = Modifier.padding(insets),
@@ -228,6 +236,25 @@ private fun Today(
 
     TodayScreen(
         state = state,
+        onOpenItem = onOpenItem,
+        contentPadding = contentPadding,
+    )
+}
+
+/** Hosts cross-board search. */
+@Composable
+private fun Search(
+    container: AppContainer,
+    onOpenItem: (String) -> Unit,
+    contentPadding: androidx.compose.foundation.layout.PaddingValues,
+) {
+    val viewModel: SearchViewModel = viewModel(factory = SearchViewModel.factory(container))
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    SearchScreen(
+        state = state,
+        onQueryChange = viewModel::setQuery,
+        onToggleFilter = viewModel::toggleFilter,
         onOpenItem = onOpenItem,
         contentPadding = contentPadding,
     )

@@ -3,8 +3,8 @@
 Every view in ProjectMate, what it's for, and what it contains.
 
 **Status: half built.** The navigation shell, the Boards home, the kanban board,
-Today, Item detail and the Inbox exist and have been run on a device; every
-other view is a named placeholder in the app, so a build on a phone shows
+Today, Item detail, the Inbox and Search exist and have been run on a device;
+every other view is a named placeholder in the app, so a build on a phone shows
 exactly how far things have got.
 
 One departure worth knowing: **the bottom bar stays visible on pushed screens.**
@@ -119,7 +119,7 @@ header, because the header belongs to the app shell and has no access to this
 screen's state; and `Import file` is absent until the import-preview screen
 exists.
 
-### 4. Search ⬜
+### 4. Search ✅
 
 | Contains | Notes |
 |---|---|
@@ -127,6 +127,24 @@ exists.
 | Filter chips | Board, status category, tag, priority, due window |
 | Results | Grouped by board |
 | Save action | "Save as view" → becomes a saved view |
+
+**Built as:** a debounced LIKE over title and notes (200 ms, so a query runs per
+pause rather than per keystroke), with filters applied in Kotlin afterwards
+because they read a status's *category* rather than any column on the item —
+the same indirection that lets statuses be renamed freely (D-002).
+
+Four chips: Active, Blocked, Urgent, Due this week, AND-combined. **Tag and
+board chips are not built** — they need the item↔tag join surfaced, which no
+screen needs yet.
+
+**"Save as view" is absent.** `ViewFilter` does not exist: `SavedViewEntity`
+stores a `filterJson` that nothing can write or read, and there is no `:core`
+model for it. Building the button before the engine would be a lie. That engine
+is also what §12 needs.
+
+Two additions beyond the comp: a resting hint before you type, and a
+"Nothing matches." state. The comp has neither, which leaves a bare `0 items`
+over a blank screen — that reads as broken rather than as an answer.
 
 ---
 

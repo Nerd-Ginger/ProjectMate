@@ -24,6 +24,10 @@ Anything a user would notice gets a line here, in the same commit that ships it.
 - **Item detail** — open anything from a board or from Today and edit it in
   place: title, notes, priority, status, due date, tags and a checklist with a
   progress bar. Everything saves as you go; there is no save button
+- **Search** — find anything by title or notes across every board, narrowed by
+  status, priority or due window, with results grouped by board
+- **Inbox** — everything captured, shared or imported, grouped by where it came
+  from. Move it to a board in one tap, or dismiss it
 - **Today** — one screen answering "what needs me now?" across every board.
   Overdue first, then due today, then anything sitting in a status you've marked
   as focus. Each row shows which board it came from, its status and how late it
