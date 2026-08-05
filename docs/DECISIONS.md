@@ -516,3 +516,29 @@ test that runs in the same timezone as the developer. It surfaced within a
 minute of running the app on real hardware. `DueDatesTest` already covers the
 timezone dependency ("which day it is depends on the users timezone"); the gap
 was between `:core` and the UI, where nothing was testing.
+
+---
+
+## D-021 — Moving an item carries its board, not just its status
+
+**2026-08-04 · Accepted**
+
+`ItemDao.move` writes `boardId` alongside `statusId`.
+
+**Why:** it previously wrote only `statusId`. A status belongs to exactly one
+board, so setting one without the other leaves a row claiming a board whose
+columns it is not in — it vanishes from the destination kanban (which filters by
+`boardId`), stays in the list it came from, and would render a status name from
+somewhere else entirely.
+
+The kanban never exposed this: dragging between columns keeps the same board, so
+`boardId` was already correct. Inbox triage was the first thing to move an item
+*across* boards, and it failed on the first attempt on a device — the item simply
+stayed in the Inbox.
+
+`ItemMoveTest` now covers it: the board follows the status, a triaged item leaves
+the Inbox, the Inbox query only returns the system board, and dismissing archives.
+
+**Worth noting** that this is the second bug in a row found by running the app
+rather than compiling it, and the second where the type system was no help — both
+were about a value being right in the only situation that had been exercised.

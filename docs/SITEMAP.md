@@ -3,9 +3,9 @@
 Every view in ProjectMate, what it's for, and what it contains.
 
 **Status: half built.** The navigation shell, the Boards home, the kanban board,
-Today and Item detail exist and have been run on a device; every other view is a
-named placeholder in the app, so a build on a phone shows exactly how far things
-have got.
+Today, Item detail and the Inbox exist and have been run on a device; every
+other view is a named placeholder in the app, so a build on a phone shows
+exactly how far things have got.
 
 One departure worth knowing: **the bottom bar stays visible on pushed screens.**
 The comp hides it on Item detail and the Status editor. Keeping the tabs
@@ -92,7 +92,7 @@ only draws the answer.
 earned, not broken.
 **Design note:** deliberately narrow. Anything else here erodes trust in it.
 
-### 3. Inbox ⬜
+### 3. Inbox ✅
 
 Capture is separate from triage. Anything shared, imported, or pulled from the
 website lands here without demanding a board or status first.
@@ -107,6 +107,17 @@ website lands here without demanding a board or status first.
 **Design note:** feature requests from the website arrive here. A row needs to
 show enough — requester, votes, first line of the body — to triage without
 opening it.
+
+**Built as:** everything on the system Inbox board, grouped by where it came
+from — portal first, since someone is waiting on those, then shared, imported
+and captured-here. `Move to board` lands the item on that board's **default**
+status: one decision instead of two, and the column is easy to change once it's
+on the right board. `Dismiss` archives rather than deletes.
+
+Two departures: the `Select` toggle sits above the list rather than in the page
+header, because the header belongs to the app shell and has no access to this
+screen's state; and `Import file` is absent until the import-preview screen
+exists.
 
 ### 4. Search ⬜
 

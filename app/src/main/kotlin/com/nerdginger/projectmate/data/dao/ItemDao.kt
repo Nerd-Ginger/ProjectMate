@@ -38,6 +38,26 @@ interface ItemDao {
     @Query("SELECT * FROM items WHERE id = :id AND deletedAt IS NULL")
     suspend fun getById(id: String): ItemEntity?
 
+    /**
+     * Everything sitting on the system Inbox board, awaiting triage.
+     *
+     * Joined rather than composed from `getSystemInbox()` then
+     * `observeForBoard()`, so this stays a single observable query — the Inbox
+     * badge in the bottom bar reads it continuously.
+     */
+    @Query(
+        """
+        SELECT i.* FROM items i
+        JOIN boards b ON b.id = i.boardId
+        WHERE b.isSystem = 1
+          AND b.deletedAt IS NULL
+          AND i.deletedAt IS NULL
+          AND i.archivedAt IS NULL
+        ORDER BY i.sortKey ASC
+        """,
+    )
+    fun observeSystemInbox(): Flow<List<ItemEntity>>
+
     @Query(
         """
         SELECT * FROM items
@@ -82,14 +102,35 @@ interface ItemDao {
     @Update
     suspend fun update(item: ItemEntity)
 
+    /**
+     * Moves an item to a status — **including onto a different board.**
+     *
+     * `boardId` is written as well as `statusId`, and it must be. A status
+     * belongs to exactly one board, so setting one without the other leaves the
+     * row claiming a board whose columns it isn't in: it vanishes from the
+     * destination kanban, stays in whatever list it came from, and renders a
+     * foreign status name. Invisible for a kanban drag, where the board doesn't
+     * change; immediate the first time Inbox triage moved something across.
+     */
     @Query(
         """
         UPDATE items
-        SET statusId = :statusId, sortKey = :sortKey, completedAt = :completedAt, updatedAt = :now
+        SET boardId = :boardId,
+            statusId = :statusId,
+            sortKey = :sortKey,
+            completedAt = :completedAt,
+            updatedAt = :now
         WHERE id = :id
         """,
     )
-    suspend fun move(id: String, statusId: String, sortKey: String, completedAt: Long?, now: Long)
+    suspend fun move(
+        id: String,
+        boardId: String,
+        statusId: String,
+        sortKey: String,
+        completedAt: Long?,
+        now: Long,
+    )
 
     @Query("UPDATE items SET sortKey = :sortKey, updatedAt = :now WHERE id = :id")
     suspend fun reorder(id: String, sortKey: String, now: Long)

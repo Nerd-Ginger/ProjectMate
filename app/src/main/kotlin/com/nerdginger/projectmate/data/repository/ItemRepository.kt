@@ -28,6 +28,10 @@ class ItemRepository(
     fun observeAllLive(): Flow<List<Item>> =
         itemDao.observeAllLive().map { list -> list.map { it.toDomain() } }
 
+    /** Everything on the system Inbox board, awaiting triage. */
+    fun observeInbox(): Flow<List<Item>> =
+        itemDao.observeSystemInbox().map { list -> list.map { it.toDomain() } }
+
     fun observeById(itemId: String): Flow<Item?> =
         itemDao.observeById(itemId).map { it?.toDomain() }
 
@@ -61,6 +65,9 @@ class ItemRepository(
     /**
      * Moves an item to a status, appending it to that column.
      *
+     * The destination carries its own `boardId`, so this handles a move to
+     * another board — Inbox triage — as well as a move between columns.
+     *
      * `completedAt` is derived from the destination's category rather than
      * asked for: moving a card into any status the user has marked Done is
      * what "completing" means here, whatever they named the column.
@@ -73,6 +80,7 @@ class ItemRepository(
         }
         itemDao.move(
             id = item.id,
+            boardId = destination.boardId,
             statusId = destination.id,
             sortKey = SortKey.between(itemDao.lastSortKeyInStatus(destination.id), null),
             completedAt = completedAt,

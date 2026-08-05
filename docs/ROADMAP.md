@@ -43,7 +43,7 @@ The goal: an app that is genuinely usable every day with no server involved.
 - ⬜ **List view** — grouped by status or due date
 - ✅ **Item detail** — notes, priority, due date, tags, checklist
 - ✅ **Today** — cross-board attention view
-- ⬜ **Inbox** — capture and triage
+- ✅ **Inbox** — capture and triage
 - ⬜ **Search** across all items
 - ⬜ **Status editor** — add, rename, recolour, reorder, set category
 - ⬜ **Settings** — export/import JSON, tags, theme, about

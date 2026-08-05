@@ -3,6 +3,7 @@ package com.nerdginger.projectmate
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,6 +52,10 @@ import com.nerdginger.projectmate.feature.board.BoardDetailViewModel
 import com.nerdginger.projectmate.feature.boards.BoardTemplateSheet
 import com.nerdginger.projectmate.feature.boards.BoardsScreen
 import com.nerdginger.projectmate.feature.boards.BoardsViewModel
+import com.nerdginger.projectmate.feature.inbox.BoardPickerSheet
+import com.nerdginger.projectmate.feature.inbox.InboxBulkBar
+import com.nerdginger.projectmate.feature.inbox.InboxScreen
+import com.nerdginger.projectmate.feature.inbox.InboxViewModel
 import com.nerdginger.projectmate.feature.item.DuePickerSheet
 import com.nerdginger.projectmate.feature.item.ItemDetailScreen
 import com.nerdginger.projectmate.feature.item.ItemDetailViewModel
@@ -184,6 +189,8 @@ fun ProjectMateApp(container: AppContainer) {
                 contentPadding = insets,
             )
 
+            is Screen.Inbox -> Inbox(container = container, contentPadding = insets)
+
             else -> ComingSoon(
                 label = screen.title(),
                 modifier = Modifier.padding(insets),
@@ -224,6 +231,58 @@ private fun Today(
         onOpenItem = onOpenItem,
         contentPadding = contentPadding,
     )
+}
+
+/**
+ * Hosts the Inbox, its board picker and its bulk action bar.
+ *
+ * The action bar floats over the list rather than scrolling with it, so it is
+ * stacked here in a Box instead of living inside the screen.
+ */
+@Composable
+private fun Inbox(
+    container: AppContainer,
+    contentPadding: androidx.compose.foundation.layout.PaddingValues,
+) {
+    val viewModel: InboxViewModel = viewModel(factory = InboxViewModel.factory(container))
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Which items a board choice will apply to: one row, or the whole selection.
+    var pendingMove by remember { mutableStateOf<Set<String>?>(null) }
+
+    Box(Modifier.fillMaxSize()) {
+        InboxScreen(
+            state = state,
+            onToggleSelecting = viewModel::toggleSelecting,
+            onToggleSelected = viewModel::toggleSelected,
+            onMoveOne = { pendingMove = setOf(it.id) },
+            onDismissOne = { viewModel.dismiss(setOf(it.id)) },
+            contentPadding = contentPadding,
+        )
+
+        if (state.isSelecting && state.selectedCount > 0) {
+            InboxBulkBar(
+                selectedCount = state.selectedCount,
+                onMove = { pendingMove = state.selected },
+                onDismiss = { viewModel.dismiss(state.selected) },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(horizontal = 14.dp)
+                    .padding(bottom = contentPadding.calculateBottomPadding() + 12.dp),
+            )
+        }
+    }
+
+    pendingMove?.let { ids ->
+        BoardPickerSheet(
+            boards = state.destinations,
+            onDismiss = { pendingMove = null },
+            onPick = { board ->
+                viewModel.moveTo(ids, board)
+                pendingMove = null
+            },
+        )
+    }
 }
 
 /**
