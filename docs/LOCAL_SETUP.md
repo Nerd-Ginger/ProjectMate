@@ -94,17 +94,22 @@ Failed to delete some children. This might happen because a process has files
 open or has its working directory set in the target directory.
 ```
 
-On a mapped or network drive (this checkout lives on `Z:`), Gradle's recursive
-delete fails intermittently and names a **different** directory each retry.
-Nothing is actually holding the files — PowerShell removes the same directory
-without complaint, which is the tell. Stopping the daemon doesn't fix it.
+Gradle's recursive delete fails intermittently and names a **different**
+directory each retry. Nothing is actually holding the files — PowerShell removes
+the same directory without complaint, which is the tell. Stopping the daemon
+doesn't fix it.
 
 ```bash
 ./gradlew --stop && rm -rf app/build core/build build
 ```
 
-then re-run. If it recurs often enough to be annoying, move the checkout to a
-local disk — the drive is the cause, not the build.
+then re-run; a clean build gets past it.
+
+This checkout lives on `Z:`, which is a **local NTFS volume** (`DriveType 3`),
+not a network share — so the usual "it's the network drive" explanation does not
+apply. The likely culprit is a real-time file scanner briefly holding handles
+under `build/`. If it becomes a nuisance, adding the repo to your antivirus
+exclusions is a better fix than moving the checkout.
 
 ---
 

@@ -129,4 +129,47 @@ class BoardTemplatesTest {
             BoardTemplates.Simple.copy(statuses = emptyList())
         }
     }
+
+    // The colour picker offers Palette and nothing else. If a template seeded a
+    // colour the picker can't offer, editing a status would silently change it
+    // to something else — so the two have to stay in step.
+
+    @Test
+    fun `every seeded status colour is one the picker can offer`() {
+        val offered = Palette.statusColors.toSet()
+        (BoardTemplates.all + BoardTemplates.Inbox).forEach { template ->
+            template.statuses.forEach { status ->
+                assertTrue(
+                    status.colorArgb in offered,
+                    "${template.id}/${status.name} uses a colour outside Palette.statusColors",
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `every board accent is one the picker can offer`() {
+        val offered = Palette.boardAccents.toSet()
+        (BoardTemplates.all + BoardTemplates.Inbox).forEach { template ->
+            assertTrue(
+                template.accentColor in offered,
+                "${template.id} uses an accent outside Palette.boardAccents",
+            )
+        }
+    }
+
+    @Test
+    fun `the palette has no duplicates`() {
+        assertEquals(Palette.statusColors.size, Palette.statusColors.toSet().size)
+        assertEquals(Palette.boardAccents.size, Palette.boardAccents.toSet().size)
+    }
+
+    @Test
+    fun `blocked statuses all use the one alarm colour`() {
+        // The palette has exactly one red. Two would dilute it.
+        (BoardTemplates.all + BoardTemplates.Inbox)
+            .flatMap { it.statuses }
+            .filter { it.category == StatusCategory.BLOCKED }
+            .forEach { assertEquals(Palette.RED, it.colorArgb, "${it.name} is not the alarm colour") }
+    }
 }

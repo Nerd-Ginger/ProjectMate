@@ -425,3 +425,70 @@ on the first colon — ids can contain anything without escaping.
 **`ImportPreview` is deliberately not restored** and degrades to the Boards
 root. Its argument is an entire JSON payload, and reviving a half-confirmed
 import after process death is worse than asking for the file again.
+
+---
+
+## D-018 — The duplicate-Kotlin-plugin warning is unfixable here, and that's accepted
+
+**2026-08-04 · Accepted**
+
+Every build prints:
+
+```
+The Kotlin Gradle plugin was loaded multiple times in different subprojects,
+which is not supported and may break the build.
+... add the Kotlin plugin to the common parent project or the root project,
+then remove the versions in the subprojects.
+```
+
+**Following that advice breaks the build.** Tried and reverted. Declaring
+`org.jetbrains.kotlin.jvm` in the root `plugins {}` block — even `apply false` —
+puts the standalone Kotlin Gradle Plugin on the shared buildscript classpath,
+where `:app` picks it up next to AGP 9's built-in Kotlin support:
+
+```
+Failed to apply plugin 'com.android.internal.application'.
+> Could not create an instance of type ...mpp.KotlinAndroidTarget
+   > com/android/build/gradle/api/BaseVariant
+```
+
+`BaseVariant` is the legacy variant API AGP 9 removed. The external Kotlin plugin
+still reaches for it; AGP's built-in one doesn't.
+
+**Why it can't be fixed:** `:core` is a pure JVM module and genuinely needs
+`kotlin.jvm`; `:app` gets Kotlin from AGP and must not also see the standalone
+plugin. Two different Kotlin plugin loads is the only configuration that works.
+This is the same AGP 9 transition that already cost us `kotlin-android`
+(see the note in `gradle/libs.versions.toml`).
+
+**Accepted because** the warning has been wrong so far — the build works, both CI
+jobs pass, and the app runs on a device. Revisit when the Kotlin Gradle Plugin
+catches up with AGP 9's variant API. Until then the warning is noise, and the
+comment in the root `build.gradle.kts` says so at the point someone would try.
+
+---
+
+## D-019 — One palette, shared by templates and the colour picker
+
+**2026-08-04 · Accepted**
+
+Status and board colours live in `core/.../template/Palette.kt`, public, and
+`BoardTemplates` seeds from it.
+
+**Considered:** leaving the nine colour constants private inside `BoardTemplates`,
+as they were.
+
+**Why:** the status editor's colour picker has to offer a set of colours. If that
+set and the templates' set were declared separately they would drift, and editing
+a status would silently shift its colour to the nearest thing the picker knew
+about. Two tests now assert that every seeded colour is one the picker offers.
+
+The values are the design comp's, replacing the earlier blue/green/violet, which
+clashed with the black-and-orange chrome (D-016). Statuses are coloured by
+**meaning** — not started, queued, in flight, blocked, finished — so a board still
+reads correctly after every status has been renamed, which is the point of
+categories (D-002).
+
+**Note:** colours are copied into rows at seed time, so **existing boards keep the
+old ones**. Only newly created boards pick these up. Recolouring existing rows
+would mean overwriting a user's own edits, which is worse than the inconsistency.
