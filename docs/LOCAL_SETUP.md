@@ -62,6 +62,15 @@ Then the app:
 ./gradlew :app:assembleDebug
 ```
 
+**Run what CI runs before you push.** `assembleDebug` and `installDebug` do not
+run lint, and lint is the step that catches `minSdk` violations — code that
+compiles, installs and works perfectly on a modern test device while crashing on
+everything older. Three commits went out red because of exactly this:
+
+```bash
+./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug :core:test
+```
+
 APK lands in `app/build/outputs/apk/debug/`. Or just hit Run in Android Studio.
 
 ### If `:app:assembleDebug` says "project not found"

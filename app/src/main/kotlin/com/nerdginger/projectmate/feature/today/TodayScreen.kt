@@ -281,7 +281,7 @@ private data class DueLabel(val text: String, val color: Color, val background: 
  */
 private fun dueLabel(entry: FocusEntry, zone: ZoneId): DueLabel? {
     val dueAt = entry.item.dueAt ?: return null
-    val date = LocalDate.ofInstant(Instant.ofEpochMilli(dueAt), zone)
+    val date = Instant.ofEpochMilli(dueAt).atZone(zone).toLocalDate()
     val short = date.format(DateTimeFormatter.ofPattern("d MMM", Locale.getDefault()))
 
     val time = if (entry.item.dueHasTime) {

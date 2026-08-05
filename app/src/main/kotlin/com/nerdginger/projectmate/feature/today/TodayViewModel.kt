@@ -20,12 +20,20 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
+/**
+ * A placeholder date for the pre-load state.
+ *
+ * Written out rather than `LocalDate.EPOCH`, which is API 34 — `minSdk` is 26,
+ * so that constant would crash on most of the range the app claims to support.
+ */
+private val EPOCH_DAY: LocalDate = LocalDate.of(1970, 1, 1)
+
 data class TodayUiState(
     val isLoading: Boolean = true,
     val sections: List<FocusSection> = emptyList(),
     /** For turning a row's `boardId` into a name, accent and monogram. */
     val boardsById: Map<String, Board> = emptyMap(),
-    val date: LocalDate = LocalDate.EPOCH,
+    val date: LocalDate = EPOCH_DAY,
 ) {
     val isEmpty: Boolean get() = !isLoading && sections.isEmpty()
 }
@@ -56,7 +64,7 @@ class TodayViewModel(
                 isLoading = false,
                 sections = TodayRules.sections(items, statusesById, now, zone),
                 boardsById = boardsById,
-                date = LocalDate.ofInstant(now, zone),
+                date = now.atZone(zone).toLocalDate(),
             )
         }.stateIn(
             scope = viewModelScope,

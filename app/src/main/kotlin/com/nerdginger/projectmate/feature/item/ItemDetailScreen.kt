@@ -150,6 +150,25 @@ fun ItemDetailScreen(
     }
 }
 
+/**
+ * Formatters are built once, outside any composable.
+ *
+ * Reading the locale inside a composable is flagged by lint
+ * (`NonObservableLocale`) because a locale change wouldn't recompose. Hoisting
+ * them also avoids rebuilding a formatter on every frame.
+ */
+private val DAY_FORMAT: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())
+
+private val TIME_FORMAT: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())
+
+private fun formatDay(epochMillis: Long): String =
+    Instant.ofEpochMilli(epochMillis)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+        .format(DAY_FORMAT)
+
 // ------------------------------------------------------------------ sections
 
 @Composable
@@ -251,12 +270,11 @@ private fun DueChip(dueAt: Long?, hasTime: Boolean, onClick: () -> Unit) {
         )
 
         else -> {
-            val date = LocalDate.ofInstant(Instant.ofEpochMilli(dueAt), zone)
+            val date = Instant.ofEpochMilli(dueAt).atZone(zone).toLocalDate()
             val today = LocalDate.now(zone)
-            val label = date.format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())) +
+            val label = formatDay(dueAt) +
                 if (hasTime) {
-                    " " + Instant.ofEpochMilli(dueAt).atZone(zone)
-                        .format(DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault()))
+                    " " + Instant.ofEpochMilli(dueAt).atZone(zone).format(TIME_FORMAT)
                 } else {
                     "  ·  all-day"
                 }
@@ -549,10 +567,7 @@ private fun FeatureRequestCard(meta: com.nerdginger.projectmate.core.model.Featu
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = "submitted " + LocalDate.ofInstant(
-                        Instant.ofEpochMilli(meta.submittedAt),
-                        ZoneId.systemDefault(),
-                    ).format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())),
+                    text = "submitted " + formatDay(meta.submittedAt),
                     fontSize = 11.sp,
                     color = tokens.mono.color,
                     modifier = Modifier.padding(top = 3.dp),

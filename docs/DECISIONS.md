@@ -542,3 +542,33 @@ the Inbox, the Inbox query only returns the system board, and dismissing archive
 **Worth noting** that this is the second bug in a row found by running the app
 rather than compiling it, and the second where the type system was no help — both
 were about a value being right in the only situation that had been exercised.
+
+---
+
+## D-022 — `java.time` on minSdk 26: not every method is available
+
+**2026-08-04 · Accepted**
+
+Avoid `LocalDate.ofInstant` and `LocalDate.EPOCH`. Use
+`instant.atZone(zone).toLocalDate()` and `LocalDate.of(1970, 1, 1)`.
+
+**Why:** `java.time` arrived on Android at API 26, which matches `minSdk` — but
+methods added to it in later Java releases arrived on Android later too.
+`LocalDate.ofInstant` and `LocalDate.EPOCH` are **API 34**. Using them compiles
+against `compileSdk` 37 without complaint and runs fine on a modern device; on
+anything from API 26 to 33 it is a `NoSuchMethodError` at runtime.
+
+Six of these shipped in the Today and Item-detail screens. They worked
+throughout device testing because the test Pixel 5 runs Android 14 — API 34, the
+exact version that made them legal.
+
+**Caught by `lintDebug`, which is not part of `assembleDebug` or `installDebug`.**
+Three commits went out with CI red because the local loop was build-install-look
+and never ran lint. The fix is procedural as much as technical: run what CI runs
+before pushing. `docs/LOCAL_SETUP.md` now gives the command.
+
+**Considered:** enabling core library desugaring, which would make the whole
+modern `java.time` surface available at any API level. Rejected for now — it
+adds a build-time transform to every dependency to buy two convenience methods
+that have one-line equivalents. Worth revisiting if the app starts wanting the
+newer API in earnest.
